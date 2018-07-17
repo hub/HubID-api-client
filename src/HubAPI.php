@@ -1,6 +1,5 @@
 <?php namespace HubID;
 
-
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -28,11 +27,6 @@ class HubAPI
     $this->hubUrl = $configurations['hubUrl'];
 
     $this->client = new Client;
-  }
-
-  public function test()
-  {
-    return 'Hello';
   }
 
   /**
