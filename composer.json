@@ -1,0 +1,21 @@
+{
+    "name": "serhiyosetskiy/hubid",
+    "description": "API",
+    "type": "library",
+    "require": {
+        "vlucas/valitron": "dev-master",
+        "guzzlehttp/psr7": "^1.5@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "HubID\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "serhiyosetskiy",
+            "email": "serhiy.osetskiy@qbex.io"
+        }
+    ],
+    "minimum-stability": "dev"
+}
