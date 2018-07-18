@@ -25,4 +25,31 @@
     // authorize
     $token = $HubID->getToken(['email' => 'test@hubculture.com', 'password' => 'mypass'];
   </dd>
+  <dt>Create new user</dt>
+  <dd>
+
+    $response = $HubID->request('post', '/user', [
+      'first' => 'First name',
+      'last' => 'Last name',
+      'email' => 'test@hubculture.com',
+      'password' => 'yourpassword',
+      'mobile' => '380668712363',
+    ]);
+    $user = $response->getContent();
+    $status = $user['status']; // whether registration is successful (true/false)
+    $token = $user['data']['token']; // token
+    $user_id = $user['data']['user_id']; // ID
+
+  </dd>
+  <dt>Authorization</dt>
+  <dd>
+
+    $response = hubid()->request('post', '/auth', [
+      'email' => 'test@hubculture.com',
+      'password' => 'yourpassword',
+    ])->getContent();
+    $token = $response['data']['token'];
+
+  </dd>
+
 </dl>
