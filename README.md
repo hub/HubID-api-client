@@ -1,4 +1,4 @@
-# Hub Culture API
+# Hub Culture API ![hubculture logo](https://hubculture.com/images/logo-hub.png)
 
 <dl>
   <dt>Connection</dt>
@@ -53,3 +53,5 @@
   </dd>
 
 </dl>
+
+**More information** [api.hubculture.com](https://api.hubculture.com/)
