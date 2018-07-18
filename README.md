@@ -4,7 +4,7 @@
   <dt>Connection</dt>
   <dd>
 
-    composer require serhiyosetskiy/hubid
+    composer require hub/hubid-api-client
   </dd>
   <dt>Using</dt>
   <dd>
