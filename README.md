@@ -1,4 +1,4 @@
-# Hub Culture API ![hubculture logo](https://hubculture.com/images/logo-hub.png)
+# Hub Culture API ![hubculture logo](https://hubculture.com/images/logo-hub-clear.png)
 
 <dl>
   <dt>Connection</dt>
@@ -33,7 +33,7 @@
       'last' => 'Last name',
       'email' => 'test@hubculture.com',
       'password' => 'yourpassword',
-      'mobile' => '380668712363',
+      'mobile' => 'XXXXXXXXXXXX',
     ]);
     $user = $response->getContent();
     $status = $user['status']; // whether registration is successful (true/false)
