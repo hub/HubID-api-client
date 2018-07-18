@@ -1,10 +1,11 @@
 {
-    "name": "serhiyosetskiy/hubid",
-    "description": "API",
+    "name": "hub/hubid-api-client",
+    "description": "Library for working with Hub Culture API",
     "type": "library",
     "require": {
         "vlucas/valitron": "dev-master",
-        "guzzlehttp/psr7": "^1.5@dev"
+        "guzzlehttp/psr7": "^1.5@dev",
+        "guzzlehttp/guzzle": "^6.3@dev"
     },
     "autoload": {
         "psr-4": {
