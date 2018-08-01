@@ -13,7 +13,11 @@ class HubAPI
 
   public $client;
   public $response;
-  public static $token = null;
+  public $request;
+  public static $token;
+
+
+  const COOKIE_TOKEN_NAME = 'hubid-api-client';
 
   public function __construct($configurations)
   {
@@ -60,11 +64,24 @@ class HubAPI
    * Apply the token to the request
    * @param string token - required
    */
-  public function setToken($token)
+  private function setToken($token)
   {
     self::$token = $token;
-
+    setcookie(self::COOKIE_TOKEN_NAME, self::$token, time() + 3600 * 24 * 365, '/');
     return $this;
+  }
+
+  /**
+   * Refresh token
+   * @param string token - required
+   */
+  public function refreshToken($token)
+  {
+    $newToken = $this->setToken($token)->request('put', '/token')->getContent();
+    if (!empty($newToken['data']['token'])) {
+      return $this->setToken($newToken['data']['token']);
+    }
+    return $newToken;
   }
 
   /**
@@ -73,7 +90,7 @@ class HubAPI
    * @param string dataUser['email'] - required
    * @param string dataUser['password'] - required
    */
-  public function getToken($dataUser)
+  public function auth($dataUser)
   {
     $v = new Validator($dataUser);
     $v->rule('required', ['email', 'password'])->message('{field} - is required');
@@ -99,25 +116,48 @@ class HubAPI
     return null;
   }
 
+  public function getToken()
+  {
+    if (!empty(self::$token)) {
+      return self::$token;
+    }
+    if (!empty($_COOKIE[self::COOKIE_TOKEN_NAME])) {
+      return $_COOKIE[self::COOKIE_TOKEN_NAME];
+    }
+    return null;
+  }
+
+  public function logout()
+  {
+    self::$token = null;
+    setcookie(self::COOKIE_TOKEN_NAME, null, null, '/');
+  }
+
   public function getContent($field = null)
   {
     $objectresponse = json_decode($this->response->getBody()->getContents(), true);
+    if ('token_expired' === $objectresponse['error']) {
+      return eval('return $this->refreshToken($this->getToken())->request("' . implode('","', $this->request) . '")->getContent();');
+    }
+
     if (!is_null($field) && isset($objectresponse[$field])) {
       return $objectresponse[$field];
     }
     $objectresponse['status'] = 'success' === $objectresponse['status'] ? true : false;
+
     return $objectresponse;
   }
 
   public function request($method, $uri, $parameters = [])
   {
+    $this->request = func_get_args();
     try {
       $this->response = $this->client->$method($this->hubUrl . $uri, [
         'headers' => [
           'Public-Key' => $this->public_key,
           'Private-Key' => $this->private_key,
           'Content-Type' => 'application/json',
-          'Authorization' => 'Bearer ' . self::$token,
+          'Authorization' => 'Bearer ' . $this->getToken(),
         ],
         'body' => json_encode($parameters)
       ]);

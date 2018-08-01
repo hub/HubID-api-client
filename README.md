@@ -23,7 +23,7 @@
     $passHash = $HubID->passwordHash('mypass');
 
     // authorize
-    $token = $HubID->getToken(['email' => 'test@hubculture.com', 'password' => 'mypass']);
+    $token = $HubID->auth(['email' => 'test@hubculture.com', 'password' => 'mypass']);
   </dd>
   <dt>Create new user</dt>
   <dd>
@@ -55,12 +55,31 @@
 
   <dd>
 
-    $token = ''; // token
-    $response = $HubID->setToken($token)->request('get', '/balance')->getContent();
+    // step 1 (perform if you have not previously authorized)
+    $HubID->auth(['email' => 'test@hubculture.com', 'password' => 'yourpassword']);
+    // step 2
+    $response = $HubID->request('get', '/balance')->getContent();
     var_dump($response);
 
   </dd>
 
+</dl>
+
+After authorization, the token data will be stored in the cookie, so you only need to be authorized once. The lifetime of the token will also be automatically renewed.
+
+<dl>
+  <dt>Refresh token</dt>
+  <dd>
+
+    $oldToken = $HubID->getToken();
+    $newToken = $HubID->refreshToken($oldToken);
+    var_dump($newToken);
+  </dd>
+  <dt>To log out of the authorization, use</dt>
+  <dd>
+
+    $HubID->logout();
+  </dd>
 </dl>
 
 **More information** [api.hubculture.com](https://api.hubculture.com/)
