@@ -57,6 +57,17 @@ class HubAPI
   }
 
   /**
+   * Apply the token to the request
+   * @param string token - required
+   */
+  public function setToken($token)
+  {
+    self::$token = $token;
+
+    return $this;
+  }
+
+  /**
    * Authorize on the site, in response we receive a token and user ID
    * @param array  dataUser
    * @param string dataUser['email'] - required
@@ -80,7 +91,7 @@ class HubAPI
       if (!$response['token'] && $response['error']) {
         return $this->fail($response['error']);
       }
-      self::$token = $response['token'];
+      $this->setToken($response['token']);
       return $this->success($response);
     } catch (\Exception $e) {
       return null;

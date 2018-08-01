@@ -23,7 +23,7 @@
     $passHash = $HubID->passwordHash('mypass');
 
     // authorize
-    $token = $HubID->getToken(['email' => 'test@hubculture.com', 'password' => 'mypass'];
+    $token = $HubID->getToken(['email' => 'test@hubculture.com', 'password' => 'mypass']);
   </dd>
   <dt>Create new user</dt>
   <dd>
@@ -44,11 +44,20 @@
   <dt>Authorization</dt>
   <dd>
 
-    $response = hubid()->request('post', '/auth', [
+    $response = $HubID->request('post', '/auth', [
       'email' => 'test@hubculture.com',
       'password' => 'yourpassword',
     ])->getContent();
     $token = $response['data']['token'];
+
+  </dd>
+  <dt>Get a balance</dt>
+
+  <dd>
+
+    $token = ''; // token
+    $response = $HubID->setToken($token)->request('get', '/balance')->getContent();
+    var_dump($response);
 
   </dd>
 
