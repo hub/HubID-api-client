@@ -1,5 +1,6 @@
 <?php namespace HubID;
 
+use HubID\Auth\RedirectLoginHelper;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -7,9 +8,9 @@ use Valitron\Validator;
 
 class HubAPI
 {
-  private $private_key;
-  private $public_key;
-  private $hubUrl;
+    const API_BASE_PATH = 'https://id.hubculture.com';
+
+    private $config;
 
   public $client;
   public $response;
@@ -19,19 +20,39 @@ class HubAPI
 
   const COOKIE_TOKEN_NAME = 'hubid-api-client';
 
-  public function __construct($configurations)
-  {
-    $v = new Validator($configurations);
-    $v->rule('required', ['private_key', 'public_key', 'hubUrl'])->message('{field} - is required');
-    if (!$v->validate()) {
-      throw new \Exception('fields: private_key, public_key and hubUrl is required');
-    }
-    $this->private_key = $configurations['private_key'];
-    $this->public_key = $configurations['public_key'];
-    $this->hubUrl = $configurations['hubUrl'];
+    public function __construct(array $config)
+    {
+        $validator = new Validator($config);
+        $validator
+            ->rule('required', ['private_key', 'public_key'])
+            ->message('{field} - is required');
+        if (!$validator->validate()) {
+            throw new \Exception('fields: private_key & public_key are required');
+        }
 
-    $this->client = new Client;
-  }
+        $this->config = array_merge(
+            array(
+                'base_path' => self::API_BASE_PATH,
+                'verify' => true,
+                // https://hubculture.com/developer/home
+                'client_id' => 0,
+                'private_key' => '',
+                'public_key' => '',
+            ),
+            $config
+        );
+
+        if ($this->config['verify'] === false) {
+            $this->client = new Client(array('verify' => false));
+        } else {
+            $this->client = new Client();
+        }
+    }
+
+    public function getRedirectLoginHelper()
+    {
+        return new RedirectLoginHelper($this->config);
+    }
 
   /**
    * Create a password hash
@@ -136,7 +157,7 @@ class HubAPI
   public function getContent($field = null)
   {
     $objectresponse = json_decode($this->response->getBody()->getContents(), true);
-    if ('token_expired' === $objectresponse['error']) {
+    if (isset($objectresponse['error']) && 'token_expired' === $objectresponse['error']) {
       return eval('return $this->refreshToken($this->getToken())->request("' . implode('","', $this->request) . '")->getContent();');
     }
 
@@ -152,10 +173,10 @@ class HubAPI
   {
     $this->request = func_get_args();
     try {
-      $this->response = $this->client->$method($this->hubUrl . $uri, [
+      $this->response = $this->client->$method($this->config['base_path'] . $uri, [
         'headers' => [
-          'Public-Key' => $this->public_key,
-          'Private-Key' => $this->private_key,
+          'Public-Key' => $this->config['public_key'],
+          'Private-Key' => $this->config['private_key'],
           'Content-Type' => 'application/json',
           'Authorization' => 'Bearer ' . $this->getToken(),
         ],
