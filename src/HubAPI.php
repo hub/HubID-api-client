@@ -157,8 +157,9 @@ class HubAPI
   public function getContent($field = null)
   {
     $objectresponse = json_decode($this->response->getBody()->getContents(), true);
+
     if (isset($objectresponse['error']) && 'token_expired' === $objectresponse['error']) {
-      return eval('return $this->refreshToken($this->getToken())->request("' . implode('","', $this->request) . '")->getContent();');
+      return eval('return $this->refreshToken($this->getToken())->request("' . implode('","', $this->request) . '")->getContent(' . $field . ');');
     }
 
     if (!is_null($field) && isset($objectresponse[$field])) {
