@@ -9,9 +9,11 @@ namespace HubID\Auth;
 use HubID\Service\Exception\HubIdApiExeption;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Valitron\Validator;
 
 class RedirectLoginHelper
 {
+    const API_BASE_PATH = 'https://id.hubculture.com';
     private $config;
     private $client;
 
@@ -25,8 +27,19 @@ class RedirectLoginHelper
             throw new \Exception('fields: private_key, public_key & client_id are required');
         }
 
-        $this->config = $config;
-        if (isset($this->config['verify']) && $this->config['verify'] === false) {
+        $this->config = array_merge(
+            array(
+                'base_path' => self::API_BASE_PATH,
+                'verify' => true,
+                // https://hubculture.com/developer/home
+                'client_id' => 0,
+                'private_key' => '',
+                'public_key' => '',
+            ),
+            $config
+        );
+
+        if ($this->config['verify'] === false) {
             $this->client = new Client(array('verify' => false));
         } else {
             $this->client = new Client();

@@ -10,8 +10,19 @@ class UserService extends Service
 {
     public function getUserById($id)
     {
+        if ($id === 'me') {
+            return $this->getSelf();
+        }
+
         return $this->createResponse(
             $this->request("/user/{$id}")
+        );
+    }
+
+    public function getSelf()
+    {
+        return $this->createResponse(
+            $this->request("/user")
         );
     }
 }

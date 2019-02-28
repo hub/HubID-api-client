@@ -6,6 +6,7 @@
 
 namespace HubID\Service;
 
+use Exception;
 use HubID\Service\Exception\HubIdApiExeption;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -62,6 +63,8 @@ class Service
                 )
             );
         } catch (ClientException $ex) {
+            throw new HubIdApiExeption($ex->getMessage());
+        } catch (Exception $ex) {
             throw new HubIdApiExeption($ex->getMessage());
         }
 
