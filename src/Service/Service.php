@@ -47,18 +47,25 @@ class Service
         }
     }
 
+    protected function get($api, $params = array())
+    {
+        return $this->request($api, 'get', $params);
+    }
+
+    protected function post($api, $params = array())
+    {
+        return $this->request($api, 'post', $params);
+    }
+
     protected function request($api, $method = 'get', $params = array())
     {
+        $method = strtolower($method);
+
         try {
             $response = $this->client->$method(
                 sprintf('%s%s', $this->config['base_path'], $api),
                 array(
-                    'headers' => array(
-                        'Public-Key' => $this->config['public_key'],
-                        'Private-Key' => $this->config['private_key'],
-                        'Content-Type' => 'application/json',
-                        'Authorization' => sprintf('Bearer %s', $this->config['token']),
-                    ),
+                    'headers' => $this->getHeaders(),
                     'body' => json_encode($params),
                 )
             );
@@ -88,5 +95,21 @@ class Service
         }
 
         return $response['data'];
+    }
+
+    private function getHeaders()
+    {
+        $headers = array(
+            'Content-Type' => 'application/json',
+            'Public-Key' => $this->config['public_key'],
+            'Private-Key' => $this->config['private_key'],
+        );
+
+        // inject authorization token if available
+        if (!empty($this->config['token'])) {
+            $headers['Authorization'] = sprintf('Bearer %s', $this->config['token']);
+        }
+
+        return $headers;
     }
 }
