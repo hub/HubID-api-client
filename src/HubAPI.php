@@ -123,18 +123,25 @@ class HubAPI
     try {
       $response = $authorize->getContent('data');
 
+      if (!empty($response['token'])) {
+        $this->setToken($response['token']);
+        return $this->success($response);
+      }
+
       if (isset($response['errors']['error'])) {
         return $this->fail($response['errors']['error']);
       }
-      if (!$response['token'] && $response['error']) {
+      if (!isset($response['token']) && !empty($response['error'])) {
         return $this->fail($response['error']);
       }
-      $this->setToken($response['token']);
-      return $this->success($response);
+
+      if ($response['status'] == false) {
+        return $this->fail($response['errors']);
+      }
     } catch (\Exception $e) {
-      return null;
+      return 'Auth Error!';
     }
-    return null;
+    return 'Auth Error!';
   }
 
   public function getToken()
@@ -165,6 +172,13 @@ class HubAPI
     if (!is_null($field) && isset($objectresponse[$field])) {
       return $objectresponse[$field];
     }
+    if (!empty($objectresponse['error'])) {
+      // if ($objectresponse['error'] == 'token_invalid') {
+      //   $this->logout();
+      // }
+      throw new \Exception($objectresponse['error']);
+    }
+    
     $objectresponse['status'] = 'success' === $objectresponse['status'] ? true : false;
 
     return $objectresponse;
