@@ -52,3 +52,4 @@ $service = new UserService($config);
 $user = $service->getUserById(18495);
 var_dump($user);
 ```
+
