@@ -9,13 +9,17 @@
     },
     "autoload": {
         "psr-4": {
-            "HubID\\": "src/"
+            "Hub\\HubAPI\\": "src/"
         }
     },
     "authors": [
         {
             "name": "serhiyosetskiy",
             "email": "serhiy.osetskiy@qbex.io"
+        },
+        {
+            "name": "Tharanga Kothalawala",
+            "email": "tharanga.kothalawala@hubculture.com"
         }
     ],
     "minimum-stability": "dev"

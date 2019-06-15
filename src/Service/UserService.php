@@ -4,7 +4,7 @@
  * @since  : 16-09-2018
  */
 
-namespace HubID\Service;
+namespace Hub\HubAPI\Service;
 
 class UserService extends Service
 {

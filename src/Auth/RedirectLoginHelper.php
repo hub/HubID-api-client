@@ -4,9 +4,9 @@
  * @since  : 16-09-2018
  */
 
-namespace HubID\Auth;
+namespace Hub\HubAPI\Auth;
 
-use HubID\Service\Exception\HubIdApiExeption;
+use Hub\HubAPI\Service\Exception\HubIdApiExeption;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use Valitron\Validator;
@@ -42,7 +42,7 @@ class RedirectLoginHelper
         if ($this->config['verify'] === false) {
             $this->client = new Client(array('verify' => false));
         } else {
-            $this->client = new Client();
+            $this->client = new Client(array('verify' => true));
         }
     }
 

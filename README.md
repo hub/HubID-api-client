@@ -19,16 +19,17 @@ You may look at examples under examples directory.
 ```php
 include '/vendor/autoload.php';
 
-use HubID\HubAPI;
+use Hub\HubAPI\HubClient;
 
 $redirectUrl = 'http://localhost/callback.php';
 $config = array(
+    // @see https://hubculture.com/developer/home
     'private_key' => '<your private key>',
     'public_key' => '<your public key>',
-    'client_id' => XXXXX, // your app id. @see https://hubculture.com/developer/home
+    'client_id' => 12345,
 );
 
-$hubClient = new HubAPI($config);
+$hubClient = new HubClient($config);
 
 $redirectLoginHelper = $hubClient->getRedirectLoginHelper();
 $redirectLoginHelper->getAccessToken($redirectUrl);
@@ -40,7 +41,7 @@ Retrieving a user by id
 ```php
 include '/vendor/autoload.php';
 
-use HubID\Service\UserService;
+use Hub\HubAPI\Service\UserService;
 
 $config = array(
     'private_key' => '<your private key>',

@@ -4,7 +4,7 @@
  * @since  : 16-09-2018
  */
 
-namespace HubID\Service\Exception;
+namespace Hub\HubAPI\Service\Exception;
 
 use RuntimeException;
 

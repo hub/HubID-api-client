@@ -4,10 +4,10 @@
  * @since  : 16-09-2018
  */
 
-namespace HubID\Service;
+namespace Hub\HubAPI\Service;
 
 use Exception;
-use HubID\Service\Exception\HubIdApiExeption;
+use Hub\HubAPI\Service\Exception\HubIdApiExeption;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use Valitron\Validator;

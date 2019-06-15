@@ -4,7 +4,7 @@
  * @since 09-03-2019
  */
 
-namespace HubID\Service;
+namespace Hub\HubAPI\Service;
 
 use InvalidArgumentExeption;
 

@@ -6,9 +6,10 @@
 
 include __DIR__ . '/../vendor/autoload.php';
 
-use HubID\HubAPI;
-use HubID\Service\EventService;
-use HubID\Service\UserService;
+use Hub\HubAPI\HubClient;
+use Hub\HubAPI\Service\EventService;
+use Hub\HubAPI\Service\FriendService;
+use Hub\HubAPI\Service\UserService;
 
 $redirectUrl = 'http://localhost/APIHubID/examples/user-event-data-retrieval.php';
 $config = array(
@@ -17,7 +18,7 @@ $config = array(
     'client_id' => 0,
 );
 
-$hubClient = new HubAPI($config);
+$hubClient = new HubClient($config);
 
 $redirectLoginHelper = $hubClient->getRedirectLoginHelper();
 
@@ -35,13 +36,18 @@ HTML;
 
     $config['token'] = $accessToken;
 
-    // example event data retrival
+    // example event data retrieval
     $service = new EventService($config);
     $event = $service->getEventById(141);
     var_dump($event);
 
-    // example user data retrival
+    // example user data retrieval
     $service = new UserService($config);
     $user = $service->getUserById(18495);
     var_dump($user);
+
+    // example friend list retrieval for your authenticated user
+    $service = new FriendService($config);
+    $friends = $service->getFriends();
+    var_dump($friends);
 }
