@@ -10,6 +10,7 @@ use Hub\HubAPI\HubClient;
 use Hub\HubAPI\Service\EventService;
 use Hub\HubAPI\Service\FriendService;
 use Hub\HubAPI\Service\UserService;
+use Hub\HubAPI\Service\Event\Event;
 
 $redirectUrl = 'http://localhost/APIHubID/examples/user-event-data-retrieval.php';
 $config = array(
@@ -36,10 +37,23 @@ HTML;
 
     $config['token'] = $accessToken;
 
-    // example event data retrieval
+    // example event creation and retrieval
     $service = new EventService($config);
-    $event = $service->getEventById(141);
+    $events = $service->getEvents(10);
+    var_dump($events);
+    $event = $service->create(new Event(
+        'example event',
+        'example event description',
+        776,
+        time(),
+        time() + 60 * 60 * 24,
+        '666'
+    ));
+    $event = $service->getEventById($event['id']);
     var_dump($event);
+    $attachment = $service->addAttachment($event['id'], __DIR__ . '/../Desert.jpg');
+    $service->removeAttachment($event['id'], $attachment['id']);
+    $service->deleteById($event['id']);
 
     // example user data retrieval
     $service = new UserService($config);

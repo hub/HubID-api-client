@@ -41,7 +41,7 @@ class ZekeService extends Service
         );
 
         return $this->createResponse(
-            $this->post("/zeke/sendven", $data)
+            $this->postJson("/zeke/sendven", $data)
         );
     }
 }
