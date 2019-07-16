@@ -1,6 +1,6 @@
 <?php
 /**
- * @author : Tharanga Kothalawala <tharanga.kothalawala@tsk-webdevelopment.com>
+ * @author : Tharanga Kothalawala <tharanga.kothalawala@hubculture.com>
  * @since  : 16-09-2018
  */
 
@@ -10,25 +10,36 @@ use Exception;
 use Hub\HubAPI\Service\Exception\HubIdApiExeption;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Psr\Http\Message\ResponseInterface;
 use Valitron\Validator;
 
 class Service
 {
     const API_BASE_PATH = 'https://id.hubculture.com';
-    const CONTENT_TYPE_FORM = 'multipart/form-data';
-    const CONTENT_TYPE_JSON = 'application/json';
 
+    /**
+     * @var array runtime configuration containing the credentials etc.
+     */
     protected $config;
+
+    /**
+     * @var Client curl client.
+     */
     protected $client;
 
+    /**
+     * Service constructor.
+     * @param array $config runtime configuration containing the credentials etc.
+     * @throws Exception when required config keys are not found.
+     */
     public function __construct(array $config)
     {
         $validator = new Validator($config);
         $validator
-            ->rule('required', ['private_key', 'public_key', 'token'])
+            ->rule('required', ['private_key', 'public_key'])
             ->message('{field} - is required');
         if (!$validator->validate()) {
-            throw new \Exception('fields: private_key, public_key & token are required');
+            throw new \Exception('fields: private_key, public_key are required');
         }
 
         $this->config = array_merge(
@@ -71,7 +82,7 @@ class Service
 
     protected function uploadFile($api, array $files = array())
     {
-        return $this->request(
+        return $this->rawRequest(
             $api,
             array('headers' => $this->getHeaders(), 'multipart' => array($files)),
             'post'
@@ -85,7 +96,7 @@ class Service
 
     protected function requestWithJson($api, $method = 'get', array $params = array())
     {
-        return $this->request(
+        return $this->rawRequest(
             $api,
             array('headers' => $this->getHeaders(), 'body' => json_encode($params)),
             $method
@@ -94,7 +105,7 @@ class Service
 
     protected function requestWithForm($api, $method = 'get', array $params = array())
     {
-        return $this->request(
+        return $this->rawRequest(
             $api,
             array('headers' => $this->getHeaders(), 'form_params' => $params),
             $method
@@ -120,21 +131,30 @@ class Service
         return $response['data'];
     }
 
-    private function request($api, array $payload, $method = 'get')
+    /**
+     * @param string $api api endpoint
+     * @param array $payload request data. ex: form submission data.
+     * @param string $method HTTP method to use.
+     * @return array
+     */
+    protected function rawRequest($api, array $payload, $method = 'get')
     {
         $method = strtolower($method);
         $errorResponse = null;
 
         try {
             $this->debug($api, $method, $payload);
+            /** @var ResponseInterface $response */
             $response = $this->client->$method(
                 sprintf('%s%s', $this->config['base_path'], $api),
                 $payload
             );
+
+            return json_decode($response->getBody()->getContents(), true);
         } catch (ClientException $ex) {
             $errorResponse = $ex->getResponse()->getBody()->getContents();
         } catch (Exception $ex) {
-            $errorResponse = $ex->getResponse()->getBody()->getContents();
+            $errorResponse = $ex->getMessage();
         }
 
         if (!is_null($errorResponse)) {
@@ -150,7 +170,7 @@ class Service
             throw new HubIdApiExeption($errorResponse);
         }
 
-        return json_decode($response->getBody()->getContents(), true);
+        return [];
     }
 
     private function getHeaders()
@@ -181,7 +201,7 @@ class Service
         // headers
         if (!empty($payload['headers']) && is_array($payload['headers'])) {
             foreach ($payload['headers'] as $header => $value) {
-                $headerString[] = "-H '{$header} : {$value}'";
+                $headerString[] = "-H '{$header}:{$value}'";
             }
         }
         $headerString = implode(' ', $headerString);
@@ -201,7 +221,7 @@ class Service
             $dataString = '';
         }
 
-        $string = sprintf($string, strtoupper($method), self::API_BASE_PATH . $api, $headerString, $dataString);
+        $string = sprintf($string, strtoupper($method), $this->config['base_path'] . $api, $headerString, $dataString);
         file_put_contents('/tmp/hubid-api-client.log', $string . PHP_EOL, FILE_APPEND);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @author : Tharanga Kothalawala <tharanga.kothalawala@tsk-webdevelopment.com>
+ * @author : Tharanga Kothalawala <tharanga.kothalawala@hubculture.com>
  * @since  : 16-09-2018
  */
 
@@ -11,12 +11,17 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use Valitron\Validator;
 
-class RedirectLoginHelper
+class RedirectingLoginHelper
 {
     const API_BASE_PATH = 'https://id.hubculture.com';
     private $config;
     private $client;
 
+    /**
+     * RedirectLoginHelper constructor.
+     * @param array $config
+     * @throws \Exception
+     */
     public function __construct(array $config)
     {
         $validator = new Validator($config);
@@ -46,20 +51,39 @@ class RedirectLoginHelper
         }
     }
 
-    public function getAccessToken($redirectUrl)
+    /**
+     * Use this to redirect the user to the Hub Culture login page.
+     *
+     * @param string $callbackUrl the url that you need us to redirect the user to after a login attempt.
+     */
+    public function getAccessToken($callbackUrl)
     {
-        header("Location: {$this->getLoginUrl($redirectUrl)}");
+        header("Location: {$this->getLoginUrl($callbackUrl)}");
     }
 
-    public function getLoginUrl($redirectUrl)
+    /**
+     * Use this to get the constructed redirection url for our login page.
+     * @see RedirectingLoginHelper::getAccessToken()
+     *
+     * @param string $callbackUrl the url that you need us to redirect the user to after a login attempt.
+     * @return string the URL to Hub Culture login page.
+     */
+    public function getLoginUrl($callbackUrl)
     {
         return sprintf("%s/oauth/authorization?client_id=%s&redirect_uri=%s&response_type=token",
             $this->config['base_path'],
             $this->config['client_id'],
-            $redirectUrl
+            $callbackUrl
         );
     }
 
+    /**
+     * Use this to get a refresh token.
+     * @see RedirectingLoginHelper::getAccessToken()
+     *
+     * @param string $accessToken the access token you have already.
+     * @return string|null
+     */
     public function getRefreshToken($accessToken)
     {
         $response = $this->request(sprintf("/token?grant_type=refresh_token&token=%s", $accessToken));
@@ -87,7 +111,12 @@ class RedirectLoginHelper
             'email' => $username,
             'password' => $password,
         );
+
         $response = $this->request('/auth', 'post', $credentials);
+        if (empty($response['data']['token'])) {
+            return null;
+        }
+
         return $response['data']['token'];
     }
 

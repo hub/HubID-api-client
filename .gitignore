@@ -1,3 +1,6 @@
+#IDEs
+.idea/
+
 # Composer
 composer.lock
 vendor/

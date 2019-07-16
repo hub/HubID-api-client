@@ -2,54 +2,26 @@
 
 namespace Hub\HubAPI;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
+use Hub\HubAPI\Service\Exception\HubIdApiExeption;
+use Hub\HubAPI\Service\Service;
 use Valitron\Validator;
-use Hub\HubAPI\Auth\RedirectLoginHelper;
+use Hub\HubAPI\Auth\RedirectingLoginHelper;
 
-class HubClient
+class HubClient extends Service
 {
-    const API_BASE_PATH = 'https://id.hubculture.com';
     const COOKIE_TOKEN_NAME = 'hubid-api-client';
 
-    private $config;
-    private $client;
     private $response;
     private $request;
     private static $token;
 
-    public function __construct(array $config)
+    /**
+     * @return RedirectingLoginHelper
+     * @throws \Exception
+     */
+    public function getRedirectingLoginHelper()
     {
-        $validator = new Validator($config);
-        $validator
-            ->rule('required', ['private_key', 'public_key'])
-            ->message('{field} - is required');
-        if (!$validator->validate()) {
-            throw new \Exception('fields: private_key & public_key are required');
-        }
-
-        $this->config = array_merge(
-            array(
-                'base_path' => self::API_BASE_PATH,
-                'verify' => true,
-                // https://hubculture.com/developer/home
-                'client_id' => 0,
-                'private_key' => '',
-                'public_key' => '',
-            ),
-            $config
-        );
-
-        if (false === $this->config['verify']) {
-            $this->client = new Client(array('verify' => false));
-        } else {
-            $this->client = new Client(array('verify' => true));
-        }
-    }
-
-    public function getRedirectLoginHelper()
-    {
-        return new RedirectLoginHelper($this->config);
+        return new RedirectingLoginHelper($this->config);
     }
 
     /**
@@ -57,6 +29,8 @@ class HubClient
      * For verification, you need to use - passwordVerify(password, hash).
      *
      * @param string password
+     * @return
+     * @throws \Exception
      */
     public function passwordHash($password)
     {
@@ -74,6 +48,8 @@ class HubClient
      *
      * @param string password
      * @param string hash
+     * @return
+     * @throws \Exception
      */
     public function passwordVerify($password, $hash)
     {
@@ -84,6 +60,8 @@ class HubClient
      * Refresh token.
      *
      * @param string token - required
+     * @return HubClient
+     * @throws \Exception
      */
     public function refreshToken($token)
     {
@@ -101,6 +79,7 @@ class HubClient
      * @param array  dataUser
      * @param string dataUser['email'] - required
      * @param string dataUser['password'] - required
+     * @return array|string
      */
     public function auth($dataUser)
     {
@@ -155,10 +134,15 @@ class HubClient
         setcookie(self::COOKIE_TOKEN_NAME, null, null, '/');
     }
 
+    /**
+     * @param null $field
+     * @return mixed
+     * @throws \Exception
+     */
     public function getContent($field = null)
     {
-        $objectresponse = json_decode($this->response->getBody()->getContents(), true);
-        if (isset($objectresponse['error']) && 'token_expired' === $objectresponse['error']) {
+        $objectResponse = $this->response;
+        if (isset($objectResponse['error']) && 'token_expired' === $objectResponse['error']) {
             $options = [];
             if (isset($this->request[2])) {
                 $options = $this->request[2];
@@ -169,33 +153,27 @@ class HubClient
             return eval('return $this->refreshToken($this->getToken())->request("'.implode('","', $this->request).', '.$options.'")->getContent('.$field.');');
         }
 
-        if (!is_null($field) && isset($objectresponse[$field])) {
-            return $objectresponse[$field];
+        if (!is_null($field) && isset($objectResponse[$field])) {
+            return $objectResponse[$field];
         }
-        if (!empty($objectresponse['error'])) {
-            throw new \Exception($objectresponse['error']);
+        if (!empty($objectResponse['error'])) {
+            throw new \Exception($objectResponse['error']);
         }
 
-        $objectresponse['status'] = 'success' === $objectresponse['status'] ? true : false;
+        $objectResponse['status'] = 'success' === $objectResponse['status'] ? true : false;
 
-        return $objectresponse;
+        return $objectResponse;
     }
 
     public function request($method, $uri, $parameters = [])
     {
         $this->request = func_get_args();
+
         try {
-            $this->response = $this->client->$method($this->config['base_path'].$uri, [
-                'headers' => [
-                    'Public-Key' => $this->config['public_key'],
-                    'Private-Key' => $this->config['private_key'],
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer '.$this->getToken(),
-                ],
-                'body' => json_encode($parameters),
-            ]);
-        } catch (ClientException $e) {
-            $this->response = $e->getResponse();
+            $this->config['token'] = $this->getToken();
+            $this->response = parent::rawRequest($uri, $parameters, $method);
+        } catch (HubIdApiExeption $ex) {
+            $this->response = $ex->getMessage();
         }
 
         return $this;
@@ -205,6 +183,7 @@ class HubClient
      * Apply the token to the request.
      *
      * @param string token - required
+     * @return HubClient
      */
     private function setToken($token)
     {
