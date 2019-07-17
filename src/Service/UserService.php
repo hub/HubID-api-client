@@ -1,6 +1,6 @@
 <?php
 /**
- * @author Tharanga Kothalawala <tharanga.kothalawala@tsk-webdevelopment.com>
+ * @author Tharanga Kothalawala <tharanga.kothalawala@hubculture.com>
  * @since 16-09-2018
  */
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @author : Tharanga Kothalawala <tharanga.kothalawala@tsk-webdevelopment.com>
+ * @author : Tharanga Kothalawala <tharanga.kothalawala@hubculture.com>
  * @since  : 16-09-2018
  */
 
@@ -21,7 +21,7 @@ $config = array(
 
 $hubClient = new HubClient($config);
 
-$redirectLoginHelper = $hubClient->getRedirectLoginHelper();
+$redirectLoginHelper = $hubClient->getRedirectingLoginHelper();
 
 if (empty($_GET['access_token'])) {
     $redirectLoginHelper->getAccessToken($redirectUrl);

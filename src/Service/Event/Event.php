@@ -1,12 +1,12 @@
 <?php
 /**
- * @author Tharanga Kothalawala <tharanga.kothalawala@tsk-webdevelopment.com>
+ * @author Tharanga Kothalawala <tharanga.kothalawala@hubculture.com>
  * @since 16-06-2019
  */
 
 namespace Hub\HubAPI\Service\Event;
 
-class Event
+final class Event
 {
     private $name;
     private $description;
