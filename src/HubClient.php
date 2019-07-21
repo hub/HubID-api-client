@@ -2,7 +2,7 @@
 
 namespace Hub\HubAPI;
 
-use Hub\HubAPI\Service\Exception\HubIdApiExeption;
+use Hub\HubAPI\Service\Exception\HubIdApiException;
 use Hub\HubAPI\Service\Service;
 use Valitron\Validator;
 use Hub\HubAPI\Auth\RedirectingLoginHelper;
@@ -25,31 +25,33 @@ class HubClient extends Service
     }
 
     /**
-     * Create a password hash
-     * For verification, you need to use - passwordVerify(password, hash).
+     * Create a password hash. For verification, you need to use - passwordVerify(password, hash).
+     * @see HubClient::passwordVerify()
      *
-     * @param string password
-     * @return
-     * @throws \Exception
+     * @param string $password
+     *
+     * @return string
+     * @throws HubIdApiException
      */
     public function passwordHash($password)
     {
         $pass = $this->request('post', '/password/hash', ['password' => $password])->getContent();
         if (!$pass['status'] || empty($pass['data'])) {
-            throw new \Exception('Failed to generate password');
+            throw new HubIdApiException('Failed to generate password');
         }
 
         return $pass['data'];
     }
 
     /**
-     * Password verification
-     * Verifies the password created with help - passwordHash(password).
+     * Verifies a given password created.
      *
-     * @param string password
-     * @param string hash
-     * @return
-     * @throws \Exception
+     * @param string $password User's plain text password
+     * @param string $hash     The very password hash stored in the database.
+     *
+     * @see HubClient::passwordHash()
+     *
+     * @return array
      */
     public function passwordVerify($password, $hash)
     {
@@ -57,11 +59,11 @@ class HubClient extends Service
     }
 
     /**
-     * Refresh token.
+     * Use this to get a long living refresh token.
      *
-     * @param string token - required
+     * @param string $token a valid access token.
+     *
      * @return HubClient
-     * @throws \Exception
      */
     public function refreshToken($token)
     {
@@ -76,20 +78,19 @@ class HubClient extends Service
     /**
      * Authorize on the site, in response we receive a token and user ID.
      *
-     * @param array  dataUser
-     * @param string dataUser['email'] - required
-     * @param string dataUser['password'] - required
+     * @param array $userCredentials [email: '', password: '']
+     *
      * @return array|string
      */
-    public function auth($dataUser)
+    public function auth($userCredentials)
     {
-        $v = new Validator($dataUser);
+        $v = new Validator($userCredentials);
         $v->rule('required', ['email', 'password'])->message('{field} - is required');
         if (!$v->validate()) {
             return $this->fail($v->errors());
         }
 
-        $authorize = $this->request('post', '/auth', $dataUser);
+        $authorize = $this->request('post', '/auth', $userCredentials);
         try {
             $response = $authorize->getContent('data');
 
@@ -116,18 +117,6 @@ class HubClient extends Service
         return 'Auth Error!';
     }
 
-    public function getToken()
-    {
-        if (!empty(self::$token)) {
-            return self::$token;
-        }
-        if (!empty($_COOKIE[self::COOKIE_TOKEN_NAME])) {
-            return $_COOKIE[self::COOKIE_TOKEN_NAME];
-        }
-
-        return null;
-    }
-
     public function logout()
     {
         self::$token = null;
@@ -136,8 +125,9 @@ class HubClient extends Service
 
     /**
      * @param null $field
+     *
      * @return mixed
-     * @throws \Exception
+     * @throws HubIdApiException
      */
     public function getContent($field = null)
     {
@@ -146,21 +136,22 @@ class HubClient extends Service
             $options = [];
             if (isset($this->request[2])) {
                 $options = $this->request[2];
-                $options = '['.implode('","', $options).']';
+                $options = '[' . implode('","', $options) . ']';
                 unset($this->request[2]);
             }
 
-            return eval('return $this->refreshToken($this->getToken())->request("'.implode('","', $this->request).', '.$options.'")->getContent('.$field.');');
+            return eval('return $this->refreshToken($this->getToken())->request("' . implode('","',
+                    $this->request) . ', ' . $options . '")->getContent(' . $field . ');');
         }
 
         if (!is_null($field) && isset($objectResponse[$field])) {
             return $objectResponse[$field];
         }
         if (!empty($objectResponse['error'])) {
-            throw new \Exception($objectResponse['error']);
+            throw new HubIdApiException($objectResponse['error']);
         }
 
-        $objectResponse['status'] = 'success' === $objectResponse['status'] ? true : false;
+        $objectResponse['status'] = 'success' === $objectResponse['status'];
 
         return $objectResponse;
     }
@@ -171,18 +162,28 @@ class HubClient extends Service
 
         try {
             $this->config['token'] = $this->getToken();
-            $this->response = parent::rawRequest($uri, $parameters, $method);
-        } catch (HubIdApiExeption $ex) {
+            $this->response = parent::postFormData($uri, $parameters);
+        } catch (HubIdApiException $ex) {
             $this->response = $ex->getMessage();
         }
 
         return $this;
     }
 
+    private function getToken()
+    {
+        if (!empty(self::$token)) {
+            return self::$token;
+        }
+
+        return !empty($_COOKIE[self::COOKIE_TOKEN_NAME]) ? $_COOKIE[self::COOKIE_TOKEN_NAME] : null;
+    }
+
     /**
      * Apply the token to the request.
      *
      * @param string token - required
+     *
      * @return HubClient
      */
     private function setToken($token)

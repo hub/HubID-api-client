@@ -1,21 +1,23 @@
 <?php
 /**
- * @author : Tharanga Kothalawala <tharanga.kothalawala@hubculture.com>
- * @since  : 16-09-2018
+ * @author  Tharanga Kothalawala <tharanga.kothalawala@hubculture.com>
+ * @since   16-09-2018
  */
 
 namespace Hub\HubAPI\Service;
 
 use Hub\HubAPI\Service\Event\Event;
-use InvalidArgumentExeption;
 
 class EventService extends Service
 {
     /**
      * This return any incoming events
-     * @param int $limit [optional] data limit
-     * @param int $groupId [optional] valid hub/group id can be passed to filter events.
+     *
+     * @param int $limit        [optional] data limit
+     * @param int $groupId      [optional] valid hub/group id can be passed to filter events.
      * @param int $startTimeUts [optional] pass a unix timestamp to retrieve events starting after this date.
+     *
+     * @return array
      */
     public function getEvents($limit = 10, $groupId = null, $startTimeUts = null)
     {
@@ -30,6 +32,13 @@ class EventService extends Service
         return $this->createResponse($this->get($url));
     }
 
+    /**
+     * @param Event $event the new event value object.
+     *
+     * @see Event
+     *
+     * @return array
+     */
     public function create(Event $event)
     {
         $payload = [
@@ -50,6 +59,8 @@ class EventService extends Service
      * Use this to retrieve an event data by its id.
      *
      * @param int $id The event id
+     *
+     * @return array
      */
     public function getEventById($id)
     {
@@ -59,23 +70,40 @@ class EventService extends Service
     /**
      * Use this to upload an image to an event.
      *
-     * @param int $id The event id
+     * @param int    $id               The event id
      * @param string $absoluteFilePath Absolute file path to an image file. ex: /tmp/test-image.jpg
+     *
+     * @return array
      */
     public function addAttachment($id, $absoluteFilePath)
     {
         $file = array(
             'name' => 'attachment',
-            'contents' => fopen($absoluteFilePath, 'r')
+            'contents' => fopen($absoluteFilePath, 'r'),
         );
         return $this->createResponse($this->uploadFile("/event/{$id}/attachments", $file));
     }
 
+    /**
+     * This can be used to delete an attachment of an event.
+     *
+     * @param int $id           An event identifier.
+     * @param int $attachmentId An attachment id belong to the above given event.
+     *
+     * @return array
+     */
     public function removeAttachment($id, $attachmentId)
     {
         return $this->createResponse($this->delete("/event/{$id}/attachment/{$attachmentId}"));
     }
 
+    /**
+     * This can be used to delete an event.
+     *
+     * @param int $id An event identifier.
+     *
+     * @return array
+     */
     public function deleteById($id)
     {
         return $this->createResponse($this->delete("/event/{$id}"));

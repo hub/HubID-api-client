@@ -6,7 +6,7 @@
 
 namespace Hub\HubAPI\Auth;
 
-use Hub\HubAPI\Service\Exception\HubIdApiExeption;
+use Hub\HubAPI\Service\Exception\HubIdApiException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use Valitron\Validator;
@@ -88,7 +88,7 @@ class RedirectingLoginHelper
     {
         $response = $this->request(sprintf("/token?grant_type=refresh_token&token=%s", $accessToken));
         if (!empty($response['error']) && $response['error'] === 'token_invalid') {
-            throw new HubIdApiExeption('Invalid access token provided');
+            throw new HubIdApiException('Invalid access token provided');
         }
 
         if (empty($response['data']['token'])) {
@@ -135,7 +135,7 @@ class RedirectingLoginHelper
                 )
             );
         } catch (ClientException $ex) {
-            throw new HubIdApiExeption($ex->getMessage());
+            throw new HubIdApiException($ex->getMessage());
         }
 
         return json_decode($response->getBody()->getContents(), true);

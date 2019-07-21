@@ -7,9 +7,10 @@
 namespace Hub\HubAPI\Service;
 
 use Exception;
-use Hub\HubAPI\Service\Exception\HubIdApiExeption;
+use Hub\HubAPI\Service\Exception\HubIdApiException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Valitron\Validator;
 
@@ -29,7 +30,9 @@ class Service
 
     /**
      * Service constructor.
-     * @param array $config runtime configuration containing the credentials etc.
+     *
+     * @param array $config runtime configuration containing the credentials etc. public and private keys are mandatory.
+     *
      * @throws Exception when required config keys are not found.
      */
     public function __construct(array $config)
@@ -39,7 +42,7 @@ class Service
             ->rule('required', ['private_key', 'public_key'])
             ->message('{field} - is required');
         if (!$validator->validate()) {
-            throw new \Exception('fields: private_key, public_key are required');
+            throw new InvalidArgumentException('fields: private_key, public_key are required');
         }
 
         $this->config = array_merge(
@@ -47,7 +50,7 @@ class Service
                 'base_path' => self::API_BASE_PATH,
                 'verify' => true,
 
-                // this will write any request to a log file
+                // this will write any request to a log file (location: /tmp/hubid-api-client.log)
                 'debug' => false,
 
                 // https://hubculture.com/developer/home
@@ -84,7 +87,7 @@ class Service
     {
         return $this->rawRequest(
             $api,
-            array('headers' => $this->getHeaders(), 'multipart' => array($files)),
+            array('multipart' => array($files)),
             'post'
         );
     }
@@ -98,7 +101,7 @@ class Service
     {
         return $this->rawRequest(
             $api,
-            array('headers' => $this->getHeaders(), 'body' => json_encode($params)),
+            array('body' => json_encode($params)),
             $method
         );
     }
@@ -107,7 +110,7 @@ class Service
     {
         return $this->rawRequest(
             $api,
-            array('headers' => $this->getHeaders(), 'form_params' => $params),
+            array('form_params' => $params),
             $method
         );
     }
@@ -115,7 +118,7 @@ class Service
     protected function createResponse($response)
     {
         if (!empty($response['error'])) {
-            throw new HubIdApiExeption($response['error']);
+            throw new HubIdApiException($response['error']);
         }
 
         $default = array(
@@ -132,15 +135,20 @@ class Service
     }
 
     /**
-     * @param string $api api endpoint
-     * @param array $payload request data. ex: form submission data.
-     * @param string $method HTTP method to use.
+     * @param string $api     api endpoint
+     * @param array  $payload request data. ex: form submission data.
+     * @param string $method  HTTP method to use.
+     *
      * @return array
      */
-    protected function rawRequest($api, array $payload, $method = 'get')
+    private function rawRequest($api, array $payload, $method = 'get')
     {
         $method = strtolower($method);
         $errorResponse = null;
+
+        if (empty($payload['headers'])) {
+            $payload['headers'] = $this->getHeaders();
+        }
 
         try {
             $this->debug($api, $method, $payload);
@@ -161,18 +169,22 @@ class Service
             $errorResponseDecoded = json_decode($errorResponse, true);
             if (!empty($errorResponseDecoded['errors'])) {
                 if (is_array($errorResponseDecoded['errors'])) {
-                    throw new HubIdApiExeption(print_r($errorResponseDecoded['errors'], true));
+                    throw new HubIdApiException(print_r($errorResponseDecoded['errors'], true));
                 } else {
-                    throw new HubIdApiExeption($errorResponseDecoded['errors']);
+                    throw new HubIdApiException($errorResponseDecoded['errors']);
                 }
             }
 
-            throw new HubIdApiExeption($errorResponse);
+            throw new HubIdApiException($errorResponse);
         }
 
         return [];
     }
 
+    /**
+     * Returns headers for the API request with a token if available.
+     * @return array
+     */
     private function getHeaders()
     {
         $headers = array(
@@ -188,6 +200,13 @@ class Service
         return $headers;
     }
 
+    /**
+     * Use this method to debug log the requests going out.
+     *
+     * @param string $api     called relative api endpoint
+     * @param string $method  HTTP method used.
+     * @param array  $payload request data used.
+     */
     private function debug($api, $method, array $payload)
     {
         if (!$this->config['debug']) {
@@ -210,15 +229,17 @@ class Service
             // if json
             $dataString[] = $payload['body'];
             $dataString = "--data " . (implode(' ', $dataString));
-        } else if (!empty($payload['form_params']) && is_array($payload['form_params'])) {
-            // if form data
-            foreach ($payload['form_params'] as $formParam => $value) {
-                $dataString[] = sprintf("-F '%s=%s'", $formParam, $value);
-            }
-
-            $dataString = (implode(' ', $dataString));
         } else {
-            $dataString = '';
+            if (!empty($payload['form_params']) && is_array($payload['form_params'])) {
+                // if form data
+                foreach ($payload['form_params'] as $formParam => $value) {
+                    $dataString[] = sprintf("-F '%s=%s'", $formParam, $value);
+                }
+
+                $dataString = (implode(' ', $dataString));
+            } else {
+                $dataString = '';
+            }
         }
 
         $string = sprintf($string, strtoupper($method), $this->config['base_path'] . $api, $headerString, $dataString);
