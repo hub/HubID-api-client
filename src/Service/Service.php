@@ -73,6 +73,11 @@ class Service
         return $this->requestWithForm($api, 'get', $params);
     }
 
+    protected function put($api, array $params = array())
+    {
+        return $this->requestWithForm($api, 'put', $params);
+    }
+
     protected function postJson($api, array $params = array())
     {
         return $this->requestWithJson($api, 'post', $params);
@@ -229,17 +234,17 @@ class Service
             // if json
             $dataString[] = $payload['body'];
             $dataString = "--data " . (implode(' ', $dataString));
-        } else {
-            if (!empty($payload['form_params']) && is_array($payload['form_params'])) {
-                // if form data
-                foreach ($payload['form_params'] as $formParam => $value) {
+        } else if (!empty($payload['form_params']) && is_array($payload['form_params'])) {
+            // if form data
+            foreach ($payload['form_params'] as $formParam => $value) {
+                if (is_string($value)) {
                     $dataString[] = sprintf("-F '%s=%s'", $formParam, $value);
                 }
-
-                $dataString = (implode(' ', $dataString));
-            } else {
-                $dataString = '';
             }
+
+            $dataString = (implode(' ', $dataString));
+        } else {
+            $dataString = '';
         }
 
         $string = sprintf($string, strtoupper($method), $this->config['base_path'] . $api, $headerString, $dataString);

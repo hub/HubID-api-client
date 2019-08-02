@@ -4,7 +4,7 @@
  * @since  16-06-2019
  */
 
-namespace Hub\HubAPI\Service\Event;
+namespace Hub\HubAPI\Service\Model;
 
 /**
  * This class a represents an event belong to a hub/group in the Hub Culture platform

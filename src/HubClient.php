@@ -1,4 +1,7 @@
 <?php
+/**
+ * @copyright (c) 2019 by HubCulture Ltd.
+ */
 
 namespace Hub\HubAPI;
 

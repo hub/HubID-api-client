@@ -1,7 +1,7 @@
 <?php
 /**
- * @author : Tharanga Kothalawala <tharanga.kothalawala@hubculture.com>
- * @since  : 16-09-2018
+ * @author        Tharanga Kothalawala <tharanga.kothalawala@hubculture.com>
+ * @copyright (c) 2019 by HubCulture Ltd.
  */
 
 namespace Hub\HubAPI\Auth;
@@ -19,7 +19,9 @@ class RedirectingLoginHelper
 
     /**
      * RedirectLoginHelper constructor.
+     *
      * @param array $config
+     *
      * @throws \Exception
      */
     public function __construct(array $config)
@@ -66,6 +68,7 @@ class RedirectingLoginHelper
      * @see RedirectingLoginHelper::getAccessToken()
      *
      * @param string $callbackUrl the url that you need us to redirect the user to after a login attempt.
+     *
      * @return string the URL to Hub Culture login page.
      */
     public function getLoginUrl($callbackUrl)
@@ -82,6 +85,7 @@ class RedirectingLoginHelper
      * @see RedirectingLoginHelper::getAccessToken()
      *
      * @param string $accessToken the access token you have already.
+     *
      * @return string|null
      */
     public function getRefreshToken($accessToken)
@@ -103,6 +107,7 @@ class RedirectingLoginHelper
      *
      * @param string $username username used to login to the website
      * @param string $password password used to login to the website [plain text]
+     *
      * @return string
      */
     public function getAccessTokenByUserCredentials($username, $password)

@@ -4,9 +4,9 @@
  * @since   16-09-2018
  */
 
-namespace Hub\HubAPI\Service\Event;
+namespace Hub\HubAPI\Service;
 
-use Hub\HubAPI\Service\Service;
+use Hub\HubAPI\Service\Model\Event;
 
 class EventService extends Service
 {
