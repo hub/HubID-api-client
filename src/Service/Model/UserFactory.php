@@ -6,10 +6,15 @@
 
 namespace Hub\HubAPI\Service\Model;
 
+/**
+ * This factory class can create new User objects from a given raw array of data.
+ *
+ * @package Hub\HubAPI\Service\Model
+ */
 final class UserFactory
 {
     /**
-     * @param array $data
+     * @param array $data array of raw data coming from the API.
      *
      * @return User
      */

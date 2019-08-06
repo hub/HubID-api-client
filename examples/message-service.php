@@ -39,8 +39,11 @@ HTML;
     var_dump($messageThread);
     $messageThread = $service->getThread($messageThread->getId());
     var_dump($messageThread);
-    $messageThread = $service->tagThread($messageThread->getId(), array('test', 'stan'));
-    $messageThread = $service->sentThreads();
-    $messageThread = $service->inboxThreads();
-    var_dump($messageThread);
+    var_dump($messageThread->getId());
+    $service->tagThread($messageThread->getId(), array('apitest', 'hubidsdk'));
+    $threads = $service->sentThreads();
+    $threads = $service->inboxUnreadThreads();
+    $threads = $service->inboxThreads();
+    var_dump($threads);
+    $messageThread = $service->replyToThread($messageThread->getId(), "a reply via the api - " . time());
 }

@@ -12,8 +12,6 @@ Include the library with composer.
 composer require hub/hubid-api-client
 ```
 
-You may look at examples under examples directory.
-
 ## Authentication
 
 ```php
@@ -53,3 +51,15 @@ $service = new UserService($config);
 $user = $service->getUserById(18495);
 var_dump($user);
 ```
+
+# Examples
+
+Please run the following command to run a PHP server serving examples.
+
+```bash
+make demo
+```
+
+Browse to [http://localhost:8085/message-service.php](http://localhost:8085/message-service.php).
+
+You may look at examples under examples directory.

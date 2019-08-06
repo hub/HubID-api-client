@@ -6,6 +6,10 @@
 
 namespace Hub\HubAPI\Service\Model;
 
+/**
+ * Class User
+ * @package Hub\HubAPI\Service\Model
+ */
 final class User
 {
     /** @var int */
@@ -29,7 +33,7 @@ final class User
     /**
      * User constructor.
      *
-     * @param int $id
+     * @param int $id User id
      */
     public function __construct($id)
     {
@@ -45,14 +49,6 @@ final class User
     }
 
     /**
-     * @param int $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-    /**
      * @return string
      */
     public function getFirstName()
@@ -61,7 +57,7 @@ final class User
     }
 
     /**
-     * @param string $firstName
+     * @param string $firstName First name of the user.
      */
     public function setFirstName($firstName)
     {
@@ -77,7 +73,7 @@ final class User
     }
 
     /**
-     * @param string $lastName
+     * @param string $lastName Last name of the user.
      */
     public function setLastName($lastName)
     {
@@ -93,7 +89,7 @@ final class User
     }
 
     /**
-     * @param string $email
+     * @param string $email Email address of the user.
      */
     public function setEmail($email)
     {
@@ -109,7 +105,7 @@ final class User
     }
 
     /**
-     * @param string $picture
+     * @param string $picture Profile picture of the user.
      */
     public function setPicture($picture)
     {
@@ -125,7 +121,7 @@ final class User
     }
 
     /**
-     * @param string $location
+     * @param string $location City/location of the user.
      */
     public function setLocation($location)
     {

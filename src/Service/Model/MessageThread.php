@@ -6,6 +6,10 @@
 
 namespace Hub\HubAPI\Service\Model;
 
+/**
+ * Class MessageThread
+ * @package Hub\HubAPI\Service\Model
+ */
 final class MessageThread
 {
     /**
@@ -138,6 +142,8 @@ final class MessageThread
     public function addParticipant(User $participant)
     {
         $this->participants[] = $participant;
+
+        // let's fill the recipients list excluding the sender.
         $this->recipients = array();
         foreach ($this->participants as $participant) {
             if ($participant->getId() == $this->getSender()->getId()) {
