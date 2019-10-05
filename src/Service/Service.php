@@ -237,7 +237,7 @@ class Service
         } else if (!empty($payload['form_params']) && is_array($payload['form_params'])) {
             // if form data
             foreach ($payload['form_params'] as $formParam => $value) {
-                if (is_string($value)) {
+                if (is_string($value) || is_numeric($value)) {
                     $dataString[] = sprintf("-F '%s=%s'", $formParam, $value);
                 }
             }
