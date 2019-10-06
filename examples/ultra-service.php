@@ -6,9 +6,7 @@
 
 include __DIR__ . '/config.php';
 
-use Hub\HubAPI\Service\FriendService;
-use Hub\HubAPI\Service\UltraService;
-use Hub\HubAPI\Service\UserService;
+use Hub\HubAPI\Service\UltraExchangeService;
 
 $redirectUrl = 'http://localhost:8085/ultra-service.php';
 
@@ -27,14 +25,20 @@ HTML;
     $config['token'] = $accessToken;
 
     // retrieving all ultra assets
-    $service = new UltraService($config);
-//    $assets = $service->getAllAssets();
-//    var_dump($assets);exit;
+    $service = new UltraExchangeService($config);
+    $result = $service->getRates();
+    var_dump($result);
+
+    $result = $service->convert('VEN','USD');
+    var_dump($result);
+
+    $result = $service->getAssets();
+    var_dump($result);
 
     // retrieving one ultra asset by id
-    $asset = $service->getAssetById(4);
-    var_dump($asset);
-
-    $result = $service->purchase(4, 1);
+    $result = $service->getAssetById(4);
     var_dump($result);
+
+//    $result = $service->purchase(4, 1);
+//    var_dump($result);
 }
