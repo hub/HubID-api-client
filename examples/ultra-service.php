@@ -39,6 +39,9 @@ HTML;
     $result = $service->getAssetById(4);
     var_dump($result);
 
+    $result = $service->getUserWallet(18495, 34);
+    var_dump($result);
+
 //    $result = $service->purchase(4, 1);
 //    var_dump($result);
 }

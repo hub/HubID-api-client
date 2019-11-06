@@ -97,4 +97,37 @@ class UltraExchangeService extends Service
             ]
         ));
     }
+
+    /**
+     * This returns all the wallets belong to a given user.
+     *
+     * @param int $userId A valid user id
+     *
+     * @return array
+     */
+    public function getUserWallets($userId)
+    {
+        if (intval($userId) === 0) {
+            throw new InvalidArgumentException('Please specify a valid user id');
+        }
+
+        return $this->createResponse($this->get(self::BASE . "/wallets/{$userId}"));
+    }
+
+    /**
+     * This return a user ultra wallet.
+     *
+     * @param int $userId  A valid user id
+     * @param int $assetId A valid ultra asset id
+     *
+     * @return array
+     */
+    public function getUserWallet($userId, $assetId)
+    {
+        if (intval($userId) === 0 || intval($assetId) === 0) {
+            throw new InvalidArgumentException('Please specify a valid user id and an asset id');
+        }
+
+        return $this->createResponse($this->get(self::BASE . "/wallets/{$userId}/{$assetId}"));
+    }
 }
