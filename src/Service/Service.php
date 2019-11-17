@@ -68,6 +68,16 @@ class Service
         }
     }
 
+    /**
+     * Use this to set an access token.
+     *
+     * @param string $accessToken
+     */
+    public function setAccessToken($accessToken)
+    {
+        $this->config['token'] = $accessToken;
+    }
+
     protected function get($api, array $params = array())
     {
         return $this->requestWithForm($api, 'get', $params);

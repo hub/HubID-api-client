@@ -9,50 +9,11 @@ namespace Hub\HubAPI\Auth;
 use Hub\HubAPI\Service\Exception\HubIdApiException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Hub\HubAPI\Service\Service;
 use Valitron\Validator;
 
-class RedirectingLoginHelper
+class RedirectingLoginHelper extends Service
 {
-    const API_BASE_PATH = 'https://id.hubculture.com';
-    private $config;
-    private $client;
-
-    /**
-     * RedirectLoginHelper constructor.
-     *
-     * @param array $config
-     *
-     * @throws \Exception
-     */
-    public function __construct(array $config)
-    {
-        $validator = new Validator($config);
-        $validator
-            ->rule('required', ['private_key', 'public_key', 'client_id'])
-            ->message('{field} - is required');
-        if (!$validator->validate()) {
-            throw new \Exception('fields: private_key, public_key & client_id are required');
-        }
-
-        $this->config = array_merge(
-            array(
-                'base_path' => self::API_BASE_PATH,
-                'verify' => true,
-                // https://hubculture.com/developer/home
-                'client_id' => 0,
-                'private_key' => '',
-                'public_key' => '',
-            ),
-            $config
-        );
-
-        if ($this->config['verify'] === false) {
-            $this->client = new Client(array('verify' => false));
-        } else {
-            $this->client = new Client(array('verify' => true));
-        }
-    }
-
     /**
      * Use this to redirect the user to the Hub Culture login page.
      *
@@ -90,7 +51,8 @@ class RedirectingLoginHelper
      */
     public function getRefreshToken($accessToken)
     {
-        $response = $this->request(sprintf("/token?grant_type=refresh_token&token=%s", $accessToken));
+        $this->setAccessToken($accessToken);
+        $response = $this->put('/token');
         if (!empty($response['error']) && $response['error'] === 'token_invalid') {
             throw new HubIdApiException('Invalid access token provided');
         }
