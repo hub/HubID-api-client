@@ -27,6 +27,22 @@ class UserService extends Service
     }
 
     /**
+     * Use this to upload an image to the authenticated user.
+     *
+     * @param string $absoluteFilePath Absolute file path to an image file. ex: /tmp/test-image.jpg
+     *
+     * @return array
+     */
+    public function uploadLogo($absoluteFilePath)
+    {
+        $file = array(
+            'name' => 'logo',
+            'contents' => fopen($absoluteFilePath, 'r'),
+        );
+        return $this->createResponse($this->uploadFile("/user/uploadLogo", $file));
+    }
+
+    /**
      * Use this to get the current authenticated user.
      *
      * @return array
