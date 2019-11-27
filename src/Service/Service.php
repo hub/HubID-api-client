@@ -184,7 +184,9 @@ class Service
             $errorResponseDecoded = json_decode($errorResponse, true);
             if (!empty($errorResponseDecoded['errors'])) {
                 if (is_array($errorResponseDecoded['errors'])) {
-                    throw new HubIdApiException(print_r($errorResponseDecoded['errors'], true));
+                    $exception = new HubIdApiException(print_r($errorResponseDecoded['errors'], true));
+                    $exception->setErrors($errorResponseDecoded['errors']);
+                    throw $exception;
                 } else {
                     throw new HubIdApiException($errorResponseDecoded['errors']);
                 }
