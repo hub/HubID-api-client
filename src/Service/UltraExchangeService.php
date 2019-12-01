@@ -89,45 +89,105 @@ class UltraExchangeService extends Service
         if (intval($assetId) === 0) {
             throw new InvalidArgumentException('Please specify a valid ultra asset id');
         }
+        if (floatval($assetAmount) === 0.0) {
+            throw new InvalidArgumentException('Please specify a purchase amount greater than 0');
+        }
 
         return $this->createResponse($this->postFormData(
             self::BASE . "/assets/{$assetId}/purchase",
-            [
-                'amount' => $assetAmount,
-            ]
+            ['amount' => $assetAmount]
         ));
     }
 
     /**
-     * This returns all the wallets belong to a given user.
+     * Use this to sell an existing ultra asset.
+     * As long as the authenticated user has the 'Trader' membership level, they should be able to place a sell order.
      *
-     * @param int $userId A valid user id
+     * @param int   $assetId     unique ultra asset identifier.
+     * @param float $assetAmount amount of assets that you want to sell.
      *
      * @return array
      */
-    public function getUserWallets($userId)
+    public function sell($assetId, $assetAmount)
     {
-        if (intval($userId) === 0) {
-            throw new InvalidArgumentException('Please specify a valid user id');
+        if (intval($assetId) === 0) {
+            throw new InvalidArgumentException('Please specify a valid ultra asset id');
+        }
+        if (floatval($assetAmount) === 0.0) {
+            throw new InvalidArgumentException('Please specify a sell amount greater than 0');
         }
 
-        return $this->createResponse($this->get(self::BASE . "/wallets/{$userId}"));
+        return $this->createResponse($this->postFormData(
+            self::BASE . "/assets/{$assetId}/sell",
+            ['amount' => $assetAmount]
+        ));
+    }
+
+    /**
+     * This returns all the wallet transactions done by the current authenticated user.
+     * Transactions include purchases & sell orders.
+     *
+     * @param int $offset [optional] offset for pagination
+     * @param int $limit  [optional] limit for pagination
+     *
+     * @return array
+     */
+    public function getWalletTransactions($offset = 0, $limit = 10)
+    {
+        $offset = intval($offset) === 0 ? 0 : intval($offset);
+        $limit = intval($limit) === 0 ? 10 : intval($limit);
+
+        return $this->createResponse(
+            $this->get(self::BASE . "/wallets/transactions?offset={$offset}&limit={$limit}")
+        );
+    }
+
+    /**
+     * This returns all the wallet transactions done by the current authenticated user for a given asset.
+     * Transactions include purchases & sell orders.
+     *
+     * @param int $assetId A valid ultra asset id
+     * @param int $offset  [optional] offset for pagination
+     * @param int $limit   [optional] limit for pagination
+     *
+     * @return array
+     */
+    public function getWalletTransactionsByAssetId($assetId, $offset = 0, $limit = 10)
+    {
+        if (intval($assetId) === 0) {
+            throw new InvalidArgumentException('Please specify a valid asset id');
+        }
+        $offset = intval($offset) === 0 ? 0 : intval($offset);
+        $limit = intval($limit) === 0 ? 10 : intval($limit);
+
+        return $this->createResponse(
+            $this->get(self::BASE . "/wallets/transactions/{$assetId}?offset={$offset}&limit={$limit}")
+        );
+    }
+
+    /**
+     * This returns all the wallets belong to the current authenticated user.
+     *
+     * @return array
+     */
+    public function getUserWallets()
+    {
+        return $this->createResponse($this->get(self::BASE . "/wallets"));
     }
 
     /**
      * This return a user ultra wallet.
      *
-     * @param int $userId  A valid user id
      * @param int $assetId A valid ultra asset id
      *
      * @return array
      */
-    public function getUserWallet($userId, $assetId)
+    public function getUserWallet($assetId)
     {
-        if (intval($userId) === 0 || intval($assetId) === 0) {
-            throw new InvalidArgumentException('Please specify a valid user id and an asset id');
+        if (intval($assetId) === 0) {
+            throw new InvalidArgumentException('Please specify a valid asset id');
         }
 
-        return $this->createResponse($this->get(self::BASE . "/wallets/{$userId}/{$assetId}"));
+        return $this->createResponse($this->get(self::BASE . "/wallets/asset/{$assetId}"));
     }
 }

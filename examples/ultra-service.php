@@ -39,9 +39,21 @@ HTML;
     $result = $service->getAssetById(4);
     var_dump($result);
 
-    $result = $service->getUserWallet(18495, 34);
+    $result = $service->getUserWallet(4);
+    var_dump($result);
+
+    $result = $service->getWalletTransactions();
+    var_dump($result);
+
+    $result = $service->getWalletTransactionsByAssetId(4);
+    var_dump($result);
+
+    $result = $service->getUserWallets();
     var_dump($result);
 
 //    $result = $service->purchase(4, 1);
+//    var_dump($result);
+
+//    $result = $service->sell(4, 1);
 //    var_dump($result);
 }
