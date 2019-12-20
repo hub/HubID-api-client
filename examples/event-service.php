@@ -25,22 +25,22 @@ HTML;
     // example event creation and retrieval
     $service = new EventService($config);
     // Creation
-    $event = $service->create(new Event(
-        'example event',
-        'example event description',
-        776,
-        time(),
-        time() + 60 * 60 * 24,
-        '666'
-    ));
+//    $event = $service->create(new Event(
+//        'example event',
+//        'example event description',
+//        776,
+//        time(),
+//        time() + 60 * 60 * 24,
+//        '666'
+//    ));
     // Retrieval
-    $event = $service->getEventById($event['id']);
-    var_dump($event);
+//    $event = $service->getEventById($event['id']);
+//    var_dump($event);
     $events = $service->getEvents(5);
     var_dump($events);
     // Uploading an attachment
-    $attachment = $service->addAttachment($event['id'], __DIR__ . '/test.jpg');
-    $service->removeAttachment($event['id'], $attachment['id']);
-    // Deleting an event
-    $service->deleteById($event['id']);
+//    $attachment = $service->addAttachment($event['id'], __DIR__ . '/test.jpg');
+//    $service->removeAttachment($event['id'], $attachment['id']);
+//    // Deleting an event
+//    $service->deleteById($event['id']);
 }

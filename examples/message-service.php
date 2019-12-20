@@ -28,22 +28,22 @@ HTML;
 
     // example event creation and retrieval
     $service = new MessageService($config);
-    $messageThread = $service->createThread(
-        new MessageThread(
-            'subject',
-            'content',
-            array(new User(21025), new User(23874))
-        )
-    );
-
-    var_dump($messageThread);
-    $messageThread = $service->getThread($messageThread->getId());
-    var_dump($messageThread);
-    var_dump($messageThread->getId());
-    $service->tagThread($messageThread->getId(), array('apitest', 'hubidsdk'));
-    $threads = $service->sentThreads();
-    $threads = $service->inboxUnreadThreads();
-    $threads = $service->inboxThreads();
-    var_dump($threads);
-    $messageThread = $service->replyToThread($messageThread->getId(), "a reply via the api - " . time());
+//    $messageThread = $service->createThread(
+//        new MessageThread(
+//            'subject',
+//            'content'
+////            array(new User(), new User())
+//        )
+//    );
+//
+//    var_dump($messageThread);
+//    $messageThread = $service->getThread($messageThread->getId());
+//    var_dump($messageThread);
+//    var_dump($messageThread->getId());
+//    $service->tagThread($messageThread->getId(), array('apitest', 'hubidsdk'));
+//    $threads = $service->sentThreads();
+//    $threads = $service->inboxUnreadThreads();
+//    $threads = $service->inboxThreads();
+//    var_dump($threads);
+//    $messageThread = $service->replyToThread($messageThread->getId(), "a reply via the api - " . time());
 }

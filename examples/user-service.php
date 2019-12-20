@@ -35,5 +35,6 @@ HTML;
     $friends = $service->getFriends();
     var_dump($friends);
 
+//    $service = new UserService($config);
 //    $user = $service->uploadLogo(__DIR__ . '/test.jpg');
 }
