@@ -137,9 +137,15 @@ class UltraExchangeService extends Service
         $offset = intval($offset) === 0 ? 0 : intval($offset);
         $limit = intval($limit) === 0 ? 10 : intval($limit);
 
-        return $this->createResponse(
+        $data = $this->createResponse(
             $this->get(self::BASE . "/wallets/transactions?offset={$offset}&limit={$limit}")
         );
+
+        if (isset($data['items'])) {
+            return $data['items'];
+        }
+
+        return $data;
     }
 
     /**
@@ -160,9 +166,15 @@ class UltraExchangeService extends Service
         $offset = intval($offset) === 0 ? 0 : intval($offset);
         $limit = intval($limit) === 0 ? 10 : intval($limit);
 
-        return $this->createResponse(
+        $data = $this->createResponse(
             $this->get(self::BASE . "/wallets/transactions/{$assetId}?offset={$offset}&limit={$limit}")
         );
+
+        if (isset($data['items'])) {
+            return $data['items'];
+        }
+
+        return $data;
     }
 
     /**

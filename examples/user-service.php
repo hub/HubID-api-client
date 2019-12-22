@@ -29,6 +29,8 @@ HTML;
     $service = new UserService($config);
     $user = $service->getUserById(18495);
     var_dump($user);
+    $user = $service->getSelf();
+    var_dump($user);
 
     // example friend list retrieval for your authenticated user
     $service = new FriendService($config);
