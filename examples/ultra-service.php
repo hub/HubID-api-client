@@ -51,6 +51,9 @@ HTML;
     $result = $service->getUserWallets();
     var_dump($result);
 
+    $result = $service->getCurrencyChart();
+    var_dump($result);
+
 //    $result = $service->purchase(4, 1);
 //    var_dump($result);
 

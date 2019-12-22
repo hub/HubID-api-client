@@ -190,4 +190,15 @@ class UltraExchangeService extends Service
 
         return $this->createResponse($this->get(self::BASE . "/wallets/asset/{$assetId}"));
     }
+
+    /**
+     * This return an array of all the currencies showing their overall view in terms of their rates and the rate
+     * changes.
+     *
+     * Use this if you want to show our exchange's current market index prices.
+     */
+    public function getCurrencyChart()
+    {
+        return $this->createResponse($this->get(self::BASE . "/currency-chart"));
+    }
 }
