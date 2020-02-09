@@ -204,6 +204,20 @@ class UltraExchangeService extends Service
     }
 
     /**
+     * This return a user ultra wallet by a public wallet identifier.
+     *
+     * @param string $walletPublicKey A valid public key of an ultra asset wallet
+     *
+     * @see https://hubculture.com/markets/my-wallets To get your wallet public keys
+     *
+     * @return array
+     */
+    public function getUserWalletByPublicKey($walletPublicKey)
+    {
+        return $this->createResponse($this->get(self::BASE . "/wallets/wallet/{$walletPublicKey}"));
+    }
+
+    /**
      * This return an array of all the currencies showing their overall view in terms of their rates and the rate
      * changes.
      *

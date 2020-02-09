@@ -42,6 +42,9 @@ HTML;
     $result = $service->getUserWallet(4);
     var_dump($result);
 
+    $result = $service->getUserWalletByPublicKey('338cc261f4070df90fc0a5b6fed1af6a');
+    var_dump($result);
+
     $result = $service->getWalletTransactions();
     var_dump($result);
 
