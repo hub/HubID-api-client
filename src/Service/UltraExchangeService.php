@@ -79,12 +79,15 @@ class UltraExchangeService extends Service
      * Use this to purchase a given ultra asset.
      * As long as the authenticated user has the 'Trader' membership level, they should be able to perform a purchase.
      *
-     * @param int   $assetId     unique ultra asset identifier.
-     * @param float $assetAmount amount of assets that you want to purchase.
+     * @param int   $assetId                         unique ultra asset identifier.
+     * @param float $assetAmount                     amount of assets that you want to purchase.
+     * @param float $proposedVenAmountForOneAsset    [optional] a user can propose a different rate instead using the
+     *                                               market rate. when buying an asset. The buyer is willing to pay
+     *                                               this much in Ven for one ULTRA asset.
      *
      * @return array
      */
-    public function purchase($assetId, $assetAmount)
+    public function purchase($assetId, $assetAmount, $proposedVenAmountForOneAsset = 0.0)
     {
         if (intval($assetId) === 0) {
             throw new InvalidArgumentException('Please specify a valid ultra asset id');
@@ -95,7 +98,7 @@ class UltraExchangeService extends Service
 
         return $this->createResponse($this->postFormData(
             self::BASE . "/assets/{$assetId}/purchase",
-            ['amount' => $assetAmount]
+            ['amount' => $assetAmount, 'proposed_ven_amount_for_one_asset' => $proposedVenAmountForOneAsset]
         ));
     }
 
@@ -103,12 +106,16 @@ class UltraExchangeService extends Service
      * Use this to sell an existing ultra asset.
      * As long as the authenticated user has the 'Trader' membership level, they should be able to place a sell order.
      *
-     * @param int   $assetId     unique ultra asset identifier.
-     * @param float $assetAmount amount of assets that you want to sell.
+     * @param int   $assetId                         unique ultra asset identifier.
+     * @param float $assetAmount                     amount of assets that you want to sell.
+     * @param float $proposedVenAmountForOneAsset    [optional] a user can propose a different rate instead using the
+     *                                               market rate when selling an asset. This can be used to make some
+     *                                               profit. A matching algorithm is used to match the best buy order
+     *                                               for your this given price.
      *
      * @return array
      */
-    public function sell($assetId, $assetAmount)
+    public function sell($assetId, $assetAmount, $proposedVenAmountForOneAsset = 0.0)
     {
         if (intval($assetId) === 0) {
             throw new InvalidArgumentException('Please specify a valid ultra asset id');
@@ -119,7 +126,7 @@ class UltraExchangeService extends Service
 
         return $this->createResponse($this->postFormData(
             self::BASE . "/assets/{$assetId}/sell",
-            ['amount' => $assetAmount]
+            ['amount' => $assetAmount, 'proposed_ven_amount_for_one_asset' => $proposedVenAmountForOneAsset]
         ));
     }
 
