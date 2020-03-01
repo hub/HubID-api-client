@@ -134,6 +134,8 @@ class UltraExchangeService extends Service
      * This returns all the wallet transactions done by the current authenticated user.
      * Transactions include purchases & sell orders.
      *
+     * @see UltraExchangeService::getWalletPendingTransactions for pending transactions.
+     *
      * @param int $offset [optional] offset for pagination
      * @param int $limit  [optional] limit for pagination
      *
@@ -144,15 +146,28 @@ class UltraExchangeService extends Service
         $offset = intval($offset) === 0 ? 0 : intval($offset);
         $limit = intval($limit) === 0 ? 10 : intval($limit);
 
-        $data = $this->createResponse(
+        return $this->createResponse(
             $this->get(self::BASE . "/wallets/transactions?offset={$offset}&limit={$limit}")
         );
+    }
 
-        if (isset($data['items'])) {
-            return $data['items'];
-        }
+    /**
+     * This returns all the pending wallet transactions done by the current authenticated user.
+     * This will only return the pending sell / buy orders.
+     *
+     * @param int $offset [optional] offset for pagination
+     * @param int $limit  [optional] limit for pagination
+     *
+     * @return array
+     */
+    public function getWalletPendingTransactions($offset = 0, $limit = 10)
+    {
+        $offset = intval($offset) === 0 ? 0 : intval($offset);
+        $limit = intval($limit) === 0 ? 10 : intval($limit);
 
-        return $data;
+        return $this->createResponse(
+            $this->get(self::BASE . "/wallets/pending-transactions?offset={$offset}&limit={$limit}")
+        );
     }
 
     /**
