@@ -11,6 +11,7 @@ use InvalidArgumentException;
 class UltraExchangeService extends Service
 {
     const BASE = '/ultraexchange';
+    const DEFAULT_PAGINATION_LIMIT = 10;
 
     /**
      * Use this to retrieve all the ultra rates.
@@ -34,6 +35,7 @@ class UltraExchangeService extends Service
      * @param float  $amount          [optional] Amount that you need to convert
      *
      * @return float|array
+     * @throws InvalidArgumentException on invalid conversion amount
      */
     public function convert($fromAssetTicker, $toAssetTicker, $amount = 1.0)
     {
@@ -65,6 +67,7 @@ class UltraExchangeService extends Service
      * @param int $assetId unique ultra asset identifier.
      *
      * @return array
+     * @throws InvalidArgumentException on invalid asset id
      */
     public function getAssetById($assetId)
     {
@@ -86,6 +89,7 @@ class UltraExchangeService extends Service
      *                                               this much in Ven for one ULTRA asset.
      *
      * @return array
+     * @throws InvalidArgumentException on invalid user inputs
      */
     public function purchase($assetId, $assetAmount, $proposedVenAmountForOneAsset = 0.0)
     {
@@ -95,10 +99,13 @@ class UltraExchangeService extends Service
         if (floatval($assetAmount) === 0.0) {
             throw new InvalidArgumentException('Please specify a purchase amount greater than 0');
         }
+        if (floatval($proposedVenAmountForOneAsset) < 0) {
+            throw new InvalidArgumentException('Please propose an amount greater than 0');
+        }
 
         return $this->createResponse($this->postFormData(
             self::BASE . "/assets/{$assetId}/purchase",
-            ['amount' => $assetAmount, 'proposed_ven_amount_for_one_asset' => $proposedVenAmountForOneAsset]
+            ['amount' => $assetAmount, 'proposed_ven_amount_for_one_asset' => floatval($proposedVenAmountForOneAsset)]
         ));
     }
 
@@ -111,9 +118,10 @@ class UltraExchangeService extends Service
      * @param float $proposedVenAmountForOneAsset    [optional] a user can propose a different rate instead using the
      *                                               market rate when selling an asset. This can be used to make some
      *                                               profit. A matching algorithm is used to match the best buy order
-     *                                               for your this given price.
+     *                                               for your given price.
      *
      * @return array
+     * @throws InvalidArgumentException on invalid user inputs
      */
     public function sell($assetId, $assetAmount, $proposedVenAmountForOneAsset = 0.0)
     {
@@ -123,10 +131,13 @@ class UltraExchangeService extends Service
         if (floatval($assetAmount) === 0.0) {
             throw new InvalidArgumentException('Please specify a sell amount greater than 0');
         }
+        if (floatval($proposedVenAmountForOneAsset) < 0) {
+            throw new InvalidArgumentException('Please propose an amount greater than 0');
+        }
 
         return $this->createResponse($this->postFormData(
             self::BASE . "/assets/{$assetId}/sell",
-            ['amount' => $assetAmount, 'proposed_ven_amount_for_one_asset' => $proposedVenAmountForOneAsset]
+            ['amount' => $assetAmount, 'proposed_ven_amount_for_one_asset' => floatval($proposedVenAmountForOneAsset)]
         ));
     }
 
@@ -141,10 +152,10 @@ class UltraExchangeService extends Service
      *
      * @return array
      */
-    public function getWalletTransactions($offset = 0, $limit = 10)
+    public function getWalletTransactions($offset = 0, $limit = self::DEFAULT_PAGINATION_LIMIT)
     {
         $offset = intval($offset) === 0 ? 0 : intval($offset);
-        $limit = intval($limit) === 0 ? 10 : intval($limit);
+        $limit = intval($limit) === 0 ? self::DEFAULT_PAGINATION_LIMIT : intval($limit);
 
         return $this->createResponse(
             $this->get(self::BASE . "/wallets/transactions?offset={$offset}&limit={$limit}")
@@ -160,10 +171,10 @@ class UltraExchangeService extends Service
      *
      * @return array
      */
-    public function getWalletPendingTransactions($offset = 0, $limit = 10)
+    public function getWalletPendingTransactions($offset = 0, $limit = self::DEFAULT_PAGINATION_LIMIT)
     {
         $offset = intval($offset) === 0 ? 0 : intval($offset);
-        $limit = intval($limit) === 0 ? 10 : intval($limit);
+        $limit = intval($limit) === 0 ? self::DEFAULT_PAGINATION_LIMIT : intval($limit);
 
         return $this->createResponse(
             $this->get(self::BASE . "/wallets/pending-transactions?offset={$offset}&limit={$limit}")
@@ -179,14 +190,15 @@ class UltraExchangeService extends Service
      * @param int $limit   [optional] limit for pagination
      *
      * @return array
+     * @throws InvalidArgumentException on invalid asset id
      */
-    public function getWalletTransactionsByAssetId($assetId, $offset = 0, $limit = 10)
+    public function getWalletTransactionsByAssetId($assetId, $offset = 0, $limit = self::DEFAULT_PAGINATION_LIMIT)
     {
         if (intval($assetId) === 0) {
             throw new InvalidArgumentException('Please specify a valid asset id');
         }
         $offset = intval($offset) === 0 ? 0 : intval($offset);
-        $limit = intval($limit) === 0 ? 10 : intval($limit);
+        $limit = intval($limit) === 0 ? self::DEFAULT_PAGINATION_LIMIT : intval($limit);
 
         $data = $this->createResponse(
             $this->get(self::BASE . "/wallets/transactions/{$assetId}?offset={$offset}&limit={$limit}")
@@ -215,6 +227,7 @@ class UltraExchangeService extends Service
      * @param int $assetId A valid ultra asset id
      *
      * @return array
+     * @throws InvalidArgumentException on invalid asset id
      */
     public function getUserWallet($assetId)
     {
