@@ -6,6 +6,8 @@
 
 namespace Hub\HubAPI\Service;
 
+use Hub\HubAPI\Service\Model\File;
+
 class UserService extends Service
 {
     /**
@@ -35,11 +37,9 @@ class UserService extends Service
      */
     public function uploadLogo($absoluteFilePath)
     {
-        $file = array(
-            'name' => 'logo',
-            'contents' => fopen($absoluteFilePath, 'r'),
+        return $this->createResponse(
+            $this->uploadFile("/user/uploadLogo", new File('logo', $absoluteFilePath))
         );
-        return $this->createResponse($this->uploadFile("/user/uploadLogo", $file));
     }
 
     /**

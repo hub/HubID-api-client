@@ -1,7 +1,8 @@
 <?php
 /**
- * @author : Tharanga Kothalawala <tharanga.kothalawala@hubculture.com>
- * @since  : 16-09-2018
+ * @author        Tharanga Kothalawala <tharanga.kothalawala@hubculture.com>
+ * @copyright (c) 2020 by HubCulture Ltd.
+ * @since         16-09-2018
  */
 
 namespace Hub\HubAPI\Service;
@@ -10,6 +11,7 @@ use Exception;
 use Hub\HubAPI\Service\Exception\HubIdApiException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Hub\HubAPI\Service\Model\File;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Valitron\Validator;
@@ -52,6 +54,7 @@ class Service
 
                 // this will write any request to a log file (location: /tmp/hubid-api-client.log)
                 'debug' => false,
+                'log_file' => '/tmp/hubid-api-client.log', // debug output is written to here if enabled above
 
                 // https://hubculture.com/developer/home
                 'client_id' => 0,
@@ -78,40 +81,97 @@ class Service
         $this->config['token'] = $accessToken;
     }
 
+    /**
+     * Use this to do a GET request.
+     *
+     * @param string $api    The API relative url
+     * @param array  $params request parameters / payload
+     *
+     * @return array
+     */
     protected function get($api, array $params = array())
     {
         return $this->requestWithForm($api, 'get', $params);
     }
 
+    /**
+     * Use this to do a PUT request.
+     *
+     * @param string $api    The API relative url
+     * @param array  $params request parameters / payload
+     *
+     * @return array
+     */
     protected function put($api, array $params = array())
     {
         return $this->requestWithForm($api, 'put', $params);
     }
 
+    /**
+     * Use this to do a POST request with JSON request body
+     *
+     * @param string $api    The API relative url
+     * @param array  $params request parameters / payload to be submitted as JSON
+     *
+     * @return array
+     */
     protected function postJson($api, array $params = array())
     {
         return $this->requestWithJson($api, 'post', $params);
     }
 
+    /**
+     * Use this to do a POST request.
+     *
+     * @param string $api    The API relative url
+     * @param array  $params request parameters / payload
+     *
+     * @return array
+     */
     protected function postFormData($api, array $params = array())
     {
         return $this->requestWithForm($api, 'post', $params);
     }
 
-    protected function uploadFile($api, array $files = array())
+    /**
+     * Use this to upload a file.
+     *
+     * @param string $api  The API relative url
+     * @param File   $file the file to upload
+     *
+     * @return array
+     */
+    protected function uploadFile($api, File $file)
     {
         return $this->rawRequest(
             $api,
-            array('multipart' => array($files)),
+            array('multipart' => array($file->toArray())),
             'post'
         );
     }
 
+    /**
+     * Use this to do a DELETE request.
+     *
+     * @param string $api    The API relative url
+     * @param array  $params request parameters / payload
+     *
+     * @return array
+     */
     protected function delete($api, array $params = array())
     {
         return $this->requestWithForm($api, 'delete', $params);
     }
 
+    /**
+     * Use this to send any HTTP request with JSON request body.
+     *
+     * @param string $api    The API relative url
+     * @param string $method HTTP method to use
+     * @param array  $params request parameters / payload
+     *
+     * @return array
+     */
     protected function requestWithJson($api, $method = 'get', array $params = array())
     {
         return $this->rawRequest(
@@ -121,6 +181,15 @@ class Service
         );
     }
 
+    /**
+     * Use this to send any HTTP request with request body as a form submission.
+     *
+     * @param string $api    The API relative url
+     * @param string $method HTTP method to use
+     * @param array  $params request parameters / payload
+     *
+     * @return array
+     */
     protected function requestWithForm($api, $method = 'get', array $params = array())
     {
         return $this->rawRequest(
@@ -130,7 +199,15 @@ class Service
         );
     }
 
-    protected function createResponse($response)
+    /**
+     * Use this to transform the original response from the API handling errors.
+     *
+     * @param array $response api response to be transformed
+     *
+     * @return array
+     * @throws HubIdApiException on any API error
+     */
+    protected function createResponse(array $response)
     {
         if (!empty($response['error'])) {
             throw new HubIdApiException($response['error']);
@@ -150,9 +227,12 @@ class Service
     }
 
     /**
+     * Use this to send a raw request of any type. Any types meant a form submission or a json or anything else
+     * supported by the GuzzleHttp library.
+     *
      * @param string $api     api endpoint
-     * @param array  $payload request data. ex: form submission data.
-     * @param string $method  HTTP method to use.
+     * @param array  $payload request parameters / payload
+     * @param string $method  HTTP method to use
      *
      * @return array
      */
@@ -254,12 +334,12 @@ class Service
                 }
             }
 
-            $dataString = (implode(' ', $dataString));
+            $dataString = implode(' ', $dataString);
         } else {
             $dataString = '';
         }
 
         $string = sprintf($string, strtoupper($method), $this->config['base_path'] . $api, $headerString, $dataString);
-        file_put_contents('/tmp/hubid-api-client.log', $string . PHP_EOL, FILE_APPEND);
+        file_put_contents($this->config['log_file'], $string . PHP_EOL, FILE_APPEND);
     }
 }

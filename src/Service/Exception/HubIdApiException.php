@@ -7,6 +7,7 @@
 namespace Hub\HubAPI\Service\Exception;
 
 use RuntimeException;
+use Throwable;
 
 /**
  * This represents any API errors and will be thrown if any.
@@ -18,7 +19,13 @@ class HubIdApiException extends RuntimeException
     /**
      * @var array
      */
-    public $errors;
+    private $errors;
+
+    public function __construct($message = "", $code = 0, Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+        $this->addError($message);
+    }
 
     /**
      * Use this to add a single error message.

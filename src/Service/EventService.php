@@ -7,6 +7,7 @@
 namespace Hub\HubAPI\Service;
 
 use Hub\HubAPI\Service\Model\Event;
+use Hub\HubAPI\Service\Model\File;
 
 class EventService extends Service
 {
@@ -77,11 +78,9 @@ class EventService extends Service
      */
     public function addAttachment($id, $absoluteFilePath)
     {
-        $file = array(
-            'name' => 'attachment',
-            'contents' => fopen($absoluteFilePath, 'r'),
+        return $this->createResponse(
+            $this->uploadFile("/event/{$id}/attachments", new File('attachment', $absoluteFilePath))
         );
-        return $this->createResponse($this->uploadFile("/event/{$id}/attachments", $file));
     }
 
     /**
