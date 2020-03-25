@@ -10,6 +10,35 @@ use Hub\HubAPI\Service\Model\File;
 
 class UserService extends Service
 {
+    const BASE = '/user';
+
+    /**
+     * Use this to provision a new user in the Hub Culture platform.
+     *
+     * @param string $firstName   New user's first name
+     * @param string $lastName    New user's last name
+     * @param string $email       New user's email address. This will be the login username too.
+     * @param string $password    New user's new login password
+     * @param string $phoneNumber New user's phone number
+     *
+     * @return array
+     */
+    public function registerNewUser($firstName, $lastName, $email, $password, $phoneNumber)
+    {
+        return $this->createResponse(
+            $this->postFormData(
+                self::BASE,
+                [
+                    'first' => $firstName,
+                    'last' => $lastName,
+                    'email' => $email,
+                    'password' => $password,
+                    'mobile' => $phoneNumber,
+                ]
+            )
+        );
+    }
+
     /**
      * Use this to retrieve a user by their id.
      *
@@ -24,7 +53,7 @@ class UserService extends Service
         }
 
         return $this->createResponse(
-            $this->get("/user/{$id}")
+            $this->get(self::BASE . "/{$id}")
         );
     }
 
@@ -38,7 +67,7 @@ class UserService extends Service
     public function uploadLogo($absoluteFilePath)
     {
         return $this->createResponse(
-            $this->uploadFile("/user/uploadLogo", new File('logo', $absoluteFilePath))
+            $this->uploadFile(self::BASE . "/uploadLogo", new File('logo', $absoluteFilePath))
         );
     }
 
@@ -50,7 +79,7 @@ class UserService extends Service
     public function getSelf()
     {
         return $this->createResponse(
-            $this->get("/user")
+            $this->get(self::BASE)
         );
     }
 }
