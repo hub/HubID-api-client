@@ -7,6 +7,7 @@
 namespace Hub\HubAPI\Service;
 
 use Hub\HubAPI\Service\Exception\HubIdApiException;
+use Hub\HubAPI\Service\Model\File;
 use InvalidArgumentException;
 
 /**
@@ -38,6 +39,8 @@ class PavilionService extends Service
      * @param string $territory           [optional] This is the territory where this pavilion belongs to.
      *                                    Ex: Emerald City, California State
      *
+     * @param bool   $isVisible           [optional] flag to make this new pavilion visible just after the creation
+     *
      * @return array
      */
     public function createPavilion(
@@ -48,7 +51,8 @@ class PavilionService extends Service
         $longitude,
         $latitude,
         $pavilionRelativeUrl,
-        $territory = null
+        $territory = null,
+        $isVisible = false
     ) {
         return $this->createResponse(
             $this->postFormData(
@@ -62,8 +66,29 @@ class PavilionService extends Service
                     'latitude' => $latitude,
                     'url' => $pavilionRelativeUrl,
                     'territory' => is_null($territory) ? '' : $territory,
+                    'visible' => ($isVisible) ? 1 : 0,
                 ]
             )
+        );
+    }
+
+    /**
+     * Use this to upload an image as the logo to the pavilion
+     *
+     * @param int    $pavilionId       A valid pavilion identifier.
+     * @param string $absoluteFilePath Absolute file path to an image file. ex: /tmp/test-image.jpg
+     *
+     * @return array
+     */
+    public function uploadLogo($pavilionId, $absoluteFilePath)
+    {
+        if (intval($pavilionId) === 0) {
+            throw new InvalidArgumentException('Please specify a valid pavilion id');
+        }
+
+        return $this->uploadFile(
+            sprintf('%s/%d/logo', self::BASE, $pavilionId),
+            new File('logo', $absoluteFilePath)
         );
     }
 
