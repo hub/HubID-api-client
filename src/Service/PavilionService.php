@@ -20,11 +20,11 @@ class PavilionService extends Service
     const BASE = '/pavilions';
 
     /**
-     * Use this to create a new pavilion. By creating a new pavilion, it also created a dedicated hub (aka group) with
-     * one default project within the group.
+     * Use this to create a new pavilion. As part of the process, it also creates a dedicated hub (aka group) with
+     * one default project in it.
      *
      * @param string $name                Name of the new pavilion
-     * @param string $localeName          Locale name of the new pavilion.
+     * @param string $localeName          Locale name of the new pavilion. This can be the location for example.
      * @param string $address             Address of the pavilion. This may be a paragraphs explaining what this is.
      * @param string $timezone            Timezone of the pavilion's location. This must be the standard timezone
      *                                    described in this wikipedia page.
@@ -32,7 +32,7 @@ class PavilionService extends Service
      *                                    Ex: Europe/London
      * @param string $longitude           Geo longitude of the pavilion's location. Go to http://www.latlong.net
      * @param string $latitude            Geo latitude of the pavilion's location. Go to http://www.latlong.net
-     * @param string $pavilionRelativeUrl This is the slug for the url.
+     * @param string $pavilionRelativeUrl This is the url slug for the hub culture website.
      *                                    Ex: 'london' as in https://hubculture.com/pavilions/london
      *
      * @param string $territory           [optional] This is the territory where this pavilion belongs to.
@@ -61,7 +61,7 @@ class PavilionService extends Service
                     'longitude' => $longitude,
                     'latitude' => $latitude,
                     'url' => $pavilionRelativeUrl,
-                    'territory' => $territory,
+                    'territory' => is_null($territory) ? '' : $territory,
                 ]
             )
         );
@@ -87,7 +87,7 @@ class PavilionService extends Service
     /**
      * Use this to retrieve visible pavilions by a given group id. Multiple pavilions can be related to one group.
      *
-     * @param int $groupId A valid pavilion identifier.
+     * @param int $groupId A valid group identifier.
      *
      * @return array
      * @throws HubIdApiException when no pavilion is found or the pavilion is not visible yet
@@ -112,5 +112,17 @@ class PavilionService extends Service
     public function getPavilions($territory = null)
     {
         return $this->get(self::BASE . '/list?territory=' . $territory);
+    }
+
+    /**
+     * This hard deletes a given pavilion by its id. You can only deletes the pavilions that you have created.
+     *
+     * @param int $pavilionId A valid pavilion identifier.
+     *
+     * @return array
+     */
+    public function deletePavilions($pavilionId)
+    {
+        return $this->delete(self::BASE . '/' . $pavilionId);
     }
 }
