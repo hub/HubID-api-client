@@ -19,9 +19,12 @@
             "email": "tharanga.kothalawala@hubculture.com"
         },
         {
-            "name": "serhiyosetskiy",
+            "name": "Serhiy Osetskiy",
             "email": "serhiy.osetskiy@hubculture.com"
         }
     ],
+    "suggest": {
+        "psr/log": "Include this and pass this to the library to use your existing logger to get debug output."
+    },
     "minimum-stability": "dev"
 }

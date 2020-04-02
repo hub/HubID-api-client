@@ -16,7 +16,7 @@ use InvalidArgumentException;
  *
  * @package Hub\HubAPI\Service
  */
-class PavilionService extends Service
+class PavilionService extends TokenRefreshingService
 {
     const BASE = '/pavilions';
 

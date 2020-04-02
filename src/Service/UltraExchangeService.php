@@ -8,7 +8,7 @@ namespace Hub\HubAPI\Service;
 
 use InvalidArgumentException;
 
-class UltraExchangeService extends Service
+class UltraExchangeService extends TokenRefreshingService
 {
     const BASE = '/ultraexchange';
     const DEFAULT_PAGINATION_LIMIT = 10;

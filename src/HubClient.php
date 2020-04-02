@@ -1,5 +1,7 @@
 <?php
 /**
+ * @author        Serhiy Osetskiy  <serhiy.osetskiy@hubculture.com>
+ * @author        Tharanga Kothalawala <tharanga.kothalawala@hubculture.com>
  * @copyright (c) 2019 by HubCulture Ltd.
  */
 
@@ -14,8 +16,19 @@ class HubClient extends Service
 {
     const COOKIE_TOKEN_NAME = 'hubid-api-client';
 
+    /**
+     * @var array
+     */
     private $response;
+
+    /**
+     * @var array
+     */
     private $request;
+
+    /**
+     * @var string
+     */
     private static $token;
 
     /**

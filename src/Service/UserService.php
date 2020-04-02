@@ -8,7 +8,7 @@ namespace Hub\HubAPI\Service;
 
 use Hub\HubAPI\Service\Model\File;
 
-class UserService extends Service
+class UserService extends TokenRefreshingService
 {
     const BASE = '/user';
 

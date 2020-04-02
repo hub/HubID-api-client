@@ -6,7 +6,7 @@
 
 namespace Hub\HubAPI\Service;
 
-class FriendService extends Service
+class FriendService extends TokenRefreshingService
 {
     /**
      * Returns the friends associated to the current authenticated user.
