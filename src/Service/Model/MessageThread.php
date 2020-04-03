@@ -50,17 +50,19 @@ final class MessageThread
     private $tags;
 
     /**
-     * @param string      $subject      subject of this new message thread.
-     * @param string      $content      [optional] message thread content.
-     * @param User[]|null $recipientIds [optional] list of recipient/participant ids.
-     * @param array       $tags         [optional] list of tags to be used to categorise the message thread. If a given
-     *                                  tag is not found, it will create a new one.
+     * @param string      $content      message thread content.
+     * @param User[]      $recipientIds list of recipient/participant Hub Culture users.
+     * @param string|null $subject      [optional] subject of this new message thread
+     * @param array|null  $tags         [optional] list of tags to be used to categorise the message thread.
+     *                                  If a given tag is not found, it will create a new one.
+     *
+     * @see MessageThreadFactory for creating an instance of MessageThread
      */
-    public function __construct($subject, $content = null, array $recipientIds = array(), array $tags = array())
+    public function __construct($content, array $recipientIds, $subject = null, array $tags = array())
     {
-        $this->subject = $subject;
         $this->content = $content;
         $this->recipients = $recipientIds;
+        $this->subject = $subject;
         $this->tags = $tags;
     }
 
@@ -180,9 +182,9 @@ final class MessageThread
         }
 
         return array(
-            'subject' => $this->getSubject(),
             'content' => $this->getContent(),
             'recipients' => $recipientIds,
+            'subject' => $this->getSubject(),
             'tags' => $this->getTags(),
         );
     }

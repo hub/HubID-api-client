@@ -44,18 +44,11 @@ class MessageService extends TokenRefreshingService
             return null;
         }
 
-        $item = $thread['items'][0];
-        $messageThread = new MessageThread(
-            $item['threadsubject'],
-            $item['content'],
-            array(),
-            $item['tags']
-        );
+        if (!empty($thread['items'][0])) {
+            return MessageThreadFactory::fromArray($thread['items'][0]);
+        }
 
-        $messageThread->setId($item['id']);
-        $messageThread->setSender(UserFactory::fromArray($item['sender']));
-
-        return $messageThread;
+        return null;
     }
 
     /**

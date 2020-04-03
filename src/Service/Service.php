@@ -339,10 +339,9 @@ class Service
         }
 
         $string = "curl --insecure -X%s '%s' %s %s";
-        $dataString = array();
-        $headerString = array();
 
         // headers
+        $headerString = array();
         if (!empty($payload['headers']) && is_array($payload['headers'])) {
             foreach ($payload['headers'] as $header => $value) {
                 $headerString[] = "-H '{$header}:{$value}'";
@@ -350,21 +349,26 @@ class Service
         }
         $headerString = implode(' ', $headerString);
 
+        // data
+        $dataString = '';
+        $data = array();
         if (!empty($payload['body'])) {
             // if json
-            $dataString[] = $payload['body'];
-            $dataString = "--data " . (implode(' ', $dataString));
-        } else if (!empty($payload['form_params']) && is_array($payload['form_params'])) {
+            $dataString = "--data " . $payload['body'];
+        } elseif (!empty($payload['form_params']) && is_array($payload['form_params'])) {
             // if form data
             foreach ($payload['form_params'] as $formParam => $value) {
                 if (is_string($value) || is_numeric($value)) {
-                    $dataString[] = sprintf("-F '%s=%s'", $formParam, $value);
+                    $data[] = sprintf("-F '%s=%s'", $formParam, $value);
+                }
+                if (is_array($value)) {
+                    foreach ($value as $eachValue) {
+                        $data[] = sprintf("-F '%s[]=%s'", $formParam, $eachValue);
+                    }
                 }
             }
 
-            $dataString = implode(' ', $dataString);
-        } else {
-            $dataString = '';
+            $dataString = implode(' ', $data);
         }
 
         $string = sprintf($string, strtoupper($method), $this->config['base_path'] . $api, $headerString, $dataString);
