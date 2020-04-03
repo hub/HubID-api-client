@@ -19,14 +19,14 @@ class RedirectingLoginHelper extends Service
      *
      * @param string $callbackUrl the url that you need us to redirect the user to after a login attempt.
      */
-    public function getAccessToken($callbackUrl)
+    public function redirectToLoginUrl($callbackUrl)
     {
         header("Location: {$this->getLoginUrl($callbackUrl)}");
     }
 
     /**
      * Use this to get the constructed redirection url for our login page.
-     * @see RedirectingLoginHelper::getAccessToken()
+     * @see RedirectingLoginHelper::redirectToLoginUrl()
      *
      * @param string $callbackUrl the url that you need us to redirect the user to after a login attempt.
      *
@@ -43,7 +43,7 @@ class RedirectingLoginHelper extends Service
 
     /**
      * Use this to get a refresh token.
-     * @see RedirectingLoginHelper::getAccessToken()
+     * @see RedirectingLoginHelper::redirectToLoginUrl()
      *
      * @param string $accessToken the access token you have already.
      *

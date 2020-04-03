@@ -8,7 +8,7 @@ namespace Hub\HubAPI\Service;
 
 use InvalidArgumentException;
 
-class ZekeService extends Service
+class ZekeService extends TokenRefreshingService
 {
     /**
      * Use this to send VEN to any user.

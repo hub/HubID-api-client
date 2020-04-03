@@ -21,10 +21,35 @@ class HubIdApiException extends RuntimeException
      */
     private $errors;
 
+    /**
+     * @var string This is the called API during the time this exception is thrown.
+     */
+    private $calledApi;
+
     public function __construct($message = "", $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
         $this->addError($message);
+    }
+
+    /**
+     * Returns the called API during the time this exception is thrown.
+     *
+     * @return string
+     */
+    public function getCalledApi()
+    {
+        return $this->calledApi;
+    }
+
+    /**
+     * Set the called API during the time this exception is thrown.
+     *
+     * @param string $calledApi The called API url.
+     */
+    public function setCalledApi($calledApi)
+    {
+        $this->calledApi = $calledApi;
     }
 
     /**

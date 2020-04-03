@@ -9,7 +9,7 @@ namespace Hub\HubAPI\Service;
 use Hub\HubAPI\Service\Model\Event;
 use Hub\HubAPI\Service\Model\File;
 
-class EventService extends Service
+class EventService extends TokenRefreshingService
 {
     /**
      * This return any incoming events

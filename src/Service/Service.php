@@ -8,6 +8,7 @@
 namespace Hub\HubAPI\Service;
 
 use Exception;
+use Hub\HubAPI\HubClient;
 use Hub\HubAPI\Service\Exception\HubIdApiException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -31,13 +32,20 @@ class Service
     protected $client;
 
     /**
+     * @var mixed for this class.
+     */
+    protected $logger;
+
+    /**
      * Service constructor.
      *
-     * @param array $config runtime configuration containing the credentials etc. public and private keys are mandatory.
+     * @param array      $config runtime configuration containing the credentials etc. public and private keys are
+     *                           mandatory.
+     * @param mixed|null $logger Pass a logger instane to collect debug output in to your own logging output.
      *
-     * @throws Exception when required config keys are not found.
+     * @throws InvalidArgumentException when required config keys are not found.
      */
-    public function __construct(array $config)
+    public function __construct(array $config, $logger = null)
     {
         $validator = new Validator($config);
         $validator
@@ -69,6 +77,11 @@ class Service
         } else {
             $this->client = new Client(array('verify' => true));
         }
+
+        // set the logger if psr logger is available and a valid one passed in
+        if (interface_exists('\Psr\Log\LoggerInterface') && $logger instanceof \Psr\Log\LoggerInterface) {
+            $this->logger = $logger;
+        }
     }
 
     /**
@@ -79,6 +92,16 @@ class Service
     public function setAccessToken($accessToken)
     {
         $this->config['token'] = $accessToken;
+    }
+
+    /**
+     * Returns the currently set and used access token.
+     *
+     * @return string currently set and used access token
+     */
+    public function getAccessToken()
+    {
+        return $this->config['token'];
     }
 
     /**
@@ -265,14 +288,19 @@ class Service
             if (!empty($errorResponseDecoded['errors'])) {
                 if (is_array($errorResponseDecoded['errors'])) {
                     $exception = new HubIdApiException(print_r($errorResponseDecoded['errors'], true));
+                    $exception->setCalledApi($api);
                     $exception->setErrors($errorResponseDecoded['errors']);
                     throw $exception;
                 } else {
-                    throw new HubIdApiException($errorResponseDecoded['errors']);
+                    $exception = new HubIdApiException($errorResponseDecoded['errors']);
+                    $exception->setCalledApi($api);
+                    throw $exception;
                 }
             }
 
-            throw new HubIdApiException($errorResponse);
+            $exception = new HubIdApiException($errorResponse);
+            $exception->setCalledApi($api);
+            throw $exception;
         }
 
         return [];
@@ -341,5 +369,8 @@ class Service
 
         $string = sprintf($string, strtoupper($method), $this->config['base_path'] . $api, $headerString, $dataString);
         file_put_contents($this->config['log_file'], $string . PHP_EOL, FILE_APPEND);
+        if (!is_null($this->logger)) {
+            $this->logger->debug(HubClient::COOKIE_TOKEN_NAME . ' : ' . $string);
+        }
     }
 }

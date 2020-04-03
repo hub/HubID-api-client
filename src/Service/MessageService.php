@@ -10,7 +10,7 @@ use Hub\HubAPI\Service\Model\MessageThread;
 use Hub\HubAPI\Service\Model\MessageThreadFactory;
 use Hub\HubAPI\Service\Model\UserFactory;
 
-class MessageService extends Service
+class MessageService extends TokenRefreshingService
 {
     /**
      * Use this to create a new message thread with other users.
