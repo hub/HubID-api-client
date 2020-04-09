@@ -66,6 +66,13 @@ final class Pavilion
     private $isVisible;
 
     /**
+     * @var bool flag to make this new pavilion a private. Even if the visibility is set to true, marking a pavilion as
+     *      private will prevent it from appearing on user interfaces.
+     *      Ex: https://hubculture.com/pavilions
+     */
+    private $isPrivate;
+
+    /**
      * @return int
      */
     public function getId()
@@ -256,6 +263,25 @@ final class Pavilion
     }
 
     /**
+     * @return bool
+     */
+    public function isPrivate()
+    {
+        return $this->isPrivate;
+    }
+
+    /**
+     * @param bool $isPrivate
+     *
+     * @return Pavilion
+     */
+    public function setIsPrivate($isPrivate)
+    {
+        $this->isPrivate = $isPrivate;
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function toArray()
@@ -270,6 +296,7 @@ final class Pavilion
             'url' => $this->getPavilionRelativeUrl(),
             'territory' => $this->getTerritory(),
             'visible' => $this->isVisible(),
+            'is_private' => $this->isPrivate(),
         );
 
         if (!is_null($this->getId())) {
@@ -277,6 +304,9 @@ final class Pavilion
         }
         if (!is_null($this->isVisible())) {
             $data['visible'] = ($this->isVisible()) ? 1 : 0;
+        }
+        if (!is_null($this->isPrivate())) {
+            $data['is_private'] = ($this->isPrivate()) ? 1 : 0;
         }
 
         return $data;

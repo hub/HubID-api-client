@@ -36,7 +36,8 @@ HTML;
         ->setLatitude(51.507351)
         ->setLongitude(-0.127758)
         ->setTerritory('test-territory')
-        ->setIsVisible(false);
+        ->setIsVisible(false)
+        ->setIsPrivate(true);
     $result = $service->createPavilion($pavilion);
     $newPavilionId = $result['pavilion']['id'];
     var_dump($result);
@@ -45,7 +46,8 @@ HTML;
     $pavilion->setName('name [edited] at : ' . time())
         ->setDescription('description [edited] at : ' . time())
         ->setAddress('address [edited] at : ' . time())
-        ->setIsVisible(true);
+        ->setIsVisible(true)
+        ->setIsPrivate(false);
     $result = $service->editPavilion($newPavilionId, $pavilion);
     var_dump($result);
 
