@@ -14,6 +14,12 @@ namespace Hub\HubAPI\Service\Model;
 final class Pavilion
 {
     /**
+     * the following coordinates are for the 'City of London' by default.
+     */
+    const DEFAULT_LATITUDE = 51.4975941;
+    const DEFAULT_LONGITUDE = -0.0803232;
+
+    /**
      * @var int
      */
     private $id;
@@ -37,17 +43,17 @@ final class Pavilion
      * @var string Timezone of the pavilion's location. This must be the standard timezone described in this wikipedia
      *      page. https://en.wikipedia.org/wiki/List_of_tz_database_time_zones Ex: Europe/London
      */
-    private $timezone;
+    private $timezone = 'Europe/London';
 
     /**
-     * @var string Geo longitude of the pavilion's location. Go to http://www.latlong.net
+     * @var float Geo longitude of the pavilion's location. Go to http://www.latlong.net
      */
-    private $longitude;
+    private $longitude = self::DEFAULT_LONGITUDE;
 
     /**
-     * @var string Geo latitude of the pavilion's location. Go to http://www.latlong.net
+     * @var float Geo latitude of the pavilion's location. Go to http://www.latlong.net
      */
-    private $latitude;
+    private $latitude = self::DEFAULT_LATITUDE;
 
     /**
      * @var string This is the url slug for the hub culture website.
@@ -56,21 +62,21 @@ final class Pavilion
     private $pavilionRelativeUrl;
 
     /**
-     * @var null|string This is the territory where this pavilion belongs to. Ex: Emerald City, California State
+     * @var string This is the territory where this pavilion belongs to. Ex: Emerald City, California State
      */
-    private $territory;
+    private $territory = 'default';
 
     /**
      * @var bool flag to make this new pavilion visible or hidden just after the creation
      */
-    private $isVisible;
+    private $isVisible = false;
 
     /**
      * @var bool flag to make this new pavilion a private. Even if the visibility is set to true, marking a pavilion as
      *      private will prevent it from appearing on user interfaces.
      *      Ex: https://hubculture.com/pavilions
      */
-    private $isPrivate;
+    private $isPrivate = true;
 
     /**
      * @return int
@@ -225,7 +231,10 @@ final class Pavilion
     }
 
     /**
-     * @return null|string
+     * This is used to show where this pavilion belongs to. Whether it is on a real city or in a virtual city and used
+     * as a way to categorise pavilions.
+     *
+     * @return string
      */
     public function getTerritory()
     {
@@ -233,7 +242,7 @@ final class Pavilion
     }
 
     /**
-     * @param null|string $territory
+     * @param string $territory
      *
      * @return Pavilion
      */
@@ -244,6 +253,8 @@ final class Pavilion
     }
 
     /**
+     * By default, a pavilion is NOT visible.
+     *
      * @return bool
      */
     public function isVisible()
@@ -263,6 +274,8 @@ final class Pavilion
     }
 
     /**
+     * By default, a pavilion is a private one and is not visible to public except for the created user when requested.
+     *
      * @return bool
      */
     public function isPrivate()
