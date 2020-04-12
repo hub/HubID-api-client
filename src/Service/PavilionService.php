@@ -119,6 +119,22 @@ class PavilionService extends TokenRefreshingService
     }
 
     /**
+     * Use this to retrieve all the items for sale via a given pavilion.
+     *
+     * @param int $pavilionId A valid pavilion identifier.
+     *
+     * @return array
+     */
+    public function getStoreItemsByPavilion($pavilionId)
+    {
+        if (intval($pavilionId) === 0) {
+            throw new InvalidArgumentException('Please specify a valid pavilion id');
+        }
+
+        return $this->get("/pavilion/{$pavilionId}/store-items");
+    }
+
+    /**
      * This hard deletes a given pavilion by its id. You can only deletes the pavilions that you have created.
      *
      * Please note that if this is called within the first five minutes of the pavilion creation, this will also delete
