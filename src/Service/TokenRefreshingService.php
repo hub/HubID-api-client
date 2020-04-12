@@ -193,7 +193,7 @@ class TokenRefreshingService extends Service
                 return $accessToken;
             }
 
-            if ($refreshToken != null) {
+            if (!empty($refreshToken)) {
                 return $refreshToken;
             }
         }
