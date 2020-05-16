@@ -11,6 +11,7 @@ use Hub\HubAPI\Service\Model\File;
 class UserService extends TokenRefreshingService
 {
     const BASE = '/user';
+    const DEFAULT_PAGINATION_LIMIT = 10;
 
     /**
      * Use this to provision a new user in the Hub Culture platform.
@@ -81,5 +82,22 @@ class UserService extends TokenRefreshingService
         return $this->createResponse(
             $this->get(self::BASE)
         );
+    }
+
+    /**
+     * This returns all the friends of the current authenticated user.
+     *
+     * @param int $offset [optional] offset for pagination
+     * @param int $limit  [optional] limit for pagination
+     *
+     * @return array
+     * @see FriendService::getFriends()
+     */
+    public function getFriends($offset = 0, $limit = self::DEFAULT_PAGINATION_LIMIT)
+    {
+        $offset = intval($offset) === 0 ? 0 : intval($offset);
+        $limit = intval($limit) === 0 ? self::DEFAULT_PAGINATION_LIMIT : intval($limit);
+
+        return $this->createResponse($this->get("/friends?offset={$offset}&limit={$limit}"));
     }
 }
