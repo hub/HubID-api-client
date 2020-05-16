@@ -9,6 +9,7 @@ namespace Hub\HubAPI\Service;
 class FriendService extends TokenRefreshingService
 {
     const BASE = '/friends';
+    const DEFAULT_PAGINATION_LIMIT = 10;
 
     /**
      * This returns all the friends of the current authenticated user.
@@ -19,10 +20,10 @@ class FriendService extends TokenRefreshingService
      * @return array
      * @see UserService::getFriends()
      */
-    public function getFriends($offset = 0, $limit = 10)
+    public function getFriends($offset = 0, $limit = self::DEFAULT_PAGINATION_LIMIT)
     {
         $offset = intval($offset) === 0 ? 0 : intval($offset);
-        $limit = intval($limit) === 0 ? 10 : intval($limit);
+        $limit = intval($limit) === 0 ? self::DEFAULT_PAGINATION_LIMIT : intval($limit);
 
         return $this->createResponse($this->get(self::BASE . "/?offset={$offset}&limit={$limit}"));
     }
@@ -125,5 +126,30 @@ class FriendService extends TokenRefreshingService
     public function removeFriend($friendUserId)
     {
         return $this->createResponse($this->delete("/friend/{$friendUserId}"));
+    }
+
+    /**
+     * Use this to search for friends in the current authenticated user's (your) friend list.
+     *
+     * @param string $searchKeyword The search term to search for friends in your friend list.
+     *                              This can be part of a name or an email address.
+     * @param int    $offset        [optional] offset for pagination
+     * @param int    $limit         [optional] limit for pagination
+     *
+     * @return array
+     */
+    public function searchFriends($searchKeyword, $offset = 0, $limit = self::DEFAULT_PAGINATION_LIMIT)
+    {
+        if (empty($searchKeyword)) {
+            return [];
+        }
+
+        $offset = intval($offset) === 0 ? 0 : intval($offset);
+        $limit = intval($limit) === 0 ? self::DEFAULT_PAGINATION_LIMIT : intval($limit);
+        $searchKeyword = urlencode($searchKeyword);
+
+        return $this->createResponse(
+            $this->get("/v2/friends/search?search={$searchKeyword}&offset={$offset}&limit={$limit}")
+        );
     }
 }

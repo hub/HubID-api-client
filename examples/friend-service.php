@@ -25,16 +25,19 @@ HTML;
     // example event creation and retrieval
     $service = new FriendService($config);
 
-    $potentialFriendId = 21025;
 
-    try {
-        $response = $service->addFriend('A friend request via the API SDK', $potentialFriendId);
-        var_dump($response);
-    } catch (HubIdApiException $ex) {
-        $service->removeFriend($potentialFriendId);
-        $response = $service->addFriend('A friend request via the API SDK', $potentialFriendId);
-    }
+    var_dump($service->getFriends());
     var_dump($service->getPendingFriends());
-    var_dump($service->removeFriend($potentialFriendId));
-    var_dump($service->getPendingFriends());
+    var_dump($service->getFriendRequests());
+    var_dump($service->searchFriends('user'));
+//
+//    $potentialFriendId = 123456789;
+//    try {
+//        $response = $service->addFriend('A friend request via the API SDK', $potentialFriendId);
+//        var_dump($response);
+//    } catch (HubIdApiException $ex) {
+//        $service->removeFriend($potentialFriendId);
+//        $response = $service->addFriend('A friend request via the API SDK', $potentialFriendId);
+//    }
+//    var_dump($service->removeFriend($potentialFriendId));
 }

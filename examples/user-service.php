@@ -12,7 +12,7 @@ use Hub\HubAPI\Service\UserService;
 $redirectUrl = 'http://localhost:8085/user-service.php';
 
 if (empty($_GET['access_token'])) {
-    $redirectLoginHelper->getAccessToken($redirectUrl);
+    $redirectLoginHelper->redirectToLoginUrl($redirectUrl);
 } else {
     $accessToken = $_GET['access_token'];
     $refreshedToken = $redirectLoginHelper->getRefreshToken($accessToken);

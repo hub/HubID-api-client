@@ -14,6 +14,8 @@ composer require hub/hubid-api-client
 
 ## Authentication
 
+Refer to the [https://hubculture.com/developer/home](https://hubculture.com/developer/home) for obtaining the private and public keys.
+
 ```php
 include '/vendor/autoload.php';
 
@@ -57,9 +59,9 @@ var_dump($user);
 Please run the following command to run a PHP server serving examples.
 
 ```bash
-make demo
+HUBID_PRIVATE_KEY=[your-private-key] HUBID_PUBLIC_KEY=[your-public-key] make demo
 ```
 
-Browse to [http://localhost:8085/message-service.php](http://localhost:8085/message-service.php).
+Browse to [http://localhost:8085/friend-service.php](http://localhost:8085/friend-service.php).
 
-You may look at examples under examples directory.
+You may look at examples under `examples` directory.
