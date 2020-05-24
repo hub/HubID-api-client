@@ -16,28 +16,31 @@ class UserService extends TokenRefreshingService
     /**
      * Use this to provision a new user in the Hub Culture platform.
      *
-     * @param string $firstName   New user's first name
-     * @param string $lastName    New user's last name
-     * @param string $email       New user's email address. This will be the login username too.
-     * @param string $password    New user's new login password
-     * @param string $phoneNumber New user's phone number
+     * @param string      $firstName   New user's first name
+     * @param string      $lastName    New user's last name
+     * @param string      $email       New user's email address. This will be the login username too.
+     * @param string      $password    New user's new login password
+     * @param string      $phoneNumber New user's phone number
+     * @param string|null $countryCode [optional] New user's country code. This must be the ISO 3166 representation.
+     *                                 Ex: GB
      *
      * @return array
      */
-    public function registerNewUser($firstName, $lastName, $email, $password, $phoneNumber)
+    public function registerNewUser($firstName, $lastName, $email, $password, $phoneNumber, $countryCode = null)
     {
-        return $this->createResponse(
-            $this->postFormData(
-                self::BASE,
-                [
-                    'first' => $firstName,
-                    'last' => $lastName,
-                    'email' => $email,
-                    'password' => $password,
-                    'mobile' => $phoneNumber,
-                ]
-            )
-        );
+        $payload = [
+            'first' => $firstName,
+            'last' => $lastName,
+            'email' => $email,
+            'password' => $password,
+            'mobile' => $phoneNumber,
+            'country' => $countryCode,
+        ];
+        if (!empty($countryCode) && strlen($countryCode) === 2) {
+            $payload['country'] = $countryCode;
+        }
+
+        return $this->createResponse($this->postFormData(self::BASE, $payload));
     }
 
     /**
