@@ -28,14 +28,14 @@ class UserService extends TokenRefreshingService
      */
     public function registerNewUser($firstName, $lastName, $email, $password, $phoneNumber, $countryCode = null)
     {
-        $payload = [
+        $payload = array(
             'first' => $firstName,
             'last' => $lastName,
             'email' => $email,
             'password' => $password,
             'mobile' => $phoneNumber,
             'country' => $countryCode,
-        ];
+        );
         if (!empty($countryCode) && strlen($countryCode) === 2) {
             $payload['country'] = $countryCode;
         }
@@ -56,9 +56,7 @@ class UserService extends TokenRefreshingService
             return $this->getSelf();
         }
 
-        return $this->createResponse(
-            $this->get(self::BASE . "/{$id}")
-        );
+        return $this->createResponse($this->get(self::BASE . "/{$id}"));
     }
 
     /**
@@ -82,9 +80,7 @@ class UserService extends TokenRefreshingService
      */
     public function getSelf()
     {
-        return $this->createResponse(
-            $this->get(self::BASE)
-        );
+        return $this->createResponse($this->get(self::BASE));
     }
 
     /**
@@ -102,5 +98,114 @@ class UserService extends TokenRefreshingService
         $limit = intval($limit) === 0 ? self::DEFAULT_PAGINATION_LIMIT : intval($limit);
 
         return $this->createResponse($this->get("/friends?offset={$offset}&limit={$limit}"));
+    }
+
+    /**
+     * This returns all the available health conditions. In order to get the current user's data,
+     * Please use the @see getHealthProfile
+     *
+     * @return array
+     */
+    public function getAvailableHealthConditions()
+    {
+        return $this->createResponse($this->get('/health/available-conditions'));
+    }
+
+    /**
+     * This returns a list of approved health practices.
+     *
+     * @return array
+     */
+    public function getHealthPractitioners()
+    {
+        return $this->createResponse($this->get('/health/practitioners'));
+    }
+
+    /**
+     * Use this to enrol at a health practice.
+     *
+     * @param int $practitionerId A valid health practitioner id
+     *
+     * @return array
+     * @see getHealthPractitioners To select a health practitioner
+     */
+    public function enrolAtHealthPractitioner($practitionerId)
+    {
+        $practitionerId = intval($practitionerId);
+        return $this->createResponse($this->postFormData("/health/practitioner/{$practitionerId}/enrol"));
+    }
+
+    /**
+     * Use this to un-enrol from a health practice that you are currently enrolled at.
+     *
+     * @param int $practitionerId A valid health practitioner id
+     *
+     * @return array
+     * @see getHealthPractitioners To select a health practitioner
+     */
+    public function unEnrolFromHealthPractitioner($practitionerId)
+    {
+        $practitionerId = intval($practitionerId);
+        return $this->createResponse($this->postFormData("/health/practitioner/{$practitionerId}/unenrol"));
+    }
+
+    /**
+     * Returns any health condition verifications done by a practitioner.
+     *
+     * @return array
+     */
+    public function getHealthConditionVerifications()
+    {
+        return $this->createResponse($this->get('/health/condition-verifications'));
+    }
+
+    /**
+     * This returns the user's health data. THis data is usually submitted via the HubID health page in the site.
+     *
+     * @return array
+     * @see https://hubculture.com/account/health Link to the HubID health page
+     */
+    public function getHealthProfile()
+    {
+        return $this->createResponse($this->get('/health/profile'));
+    }
+
+    /**
+     * Use this to update the health profile of the current authenticated user.
+     *
+     * @param string      $bloodType                  Blood type. Ex: A+
+     * @param string|null $medications                [optional] Any medication that the user is taking.
+     * @param array       $existingHealthConditionIds [optional] Valid health condition ids.
+     * @param int|null    $primaryPractitionerId      [optional] Passing a valid practitioner id will enrol you in
+     *                                                their practice and you will be able to communicate with the
+     *                                                practitioner. You may also use the enrol method later.
+     *
+     * @return array
+     * @see getHealthPractitioners To select a health practitioner
+     * @see getAvailableHealthConditions to get the condition ids
+     * @see enrolAtPractitioner to enrol at a health practice
+     */
+    public function setHealthProfile(
+        $bloodType,
+        $medications = null,
+        array $existingHealthConditionIds = array(),
+        $primaryPractitionerId = null
+    ) {
+        $payload = array();
+        $validBloodType = array('A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-');
+        if (in_array($bloodType, $validBloodType)) {
+            $payload['health_blood_type'] = $bloodType;
+        }
+        if (!empty($medications)) {
+            $payload['health_medications'] = $medications;
+        }
+        if (!empty($existingHealthConditionIds)) {
+            $payload['health_conditions'] = implode(',', $existingHealthConditionIds);
+        }
+        if (!is_null($primaryPractitionerId) && intval($primaryPractitionerId) > 0) {
+            $payload['primary_health_practitioner'] = $primaryPractitionerId;
+        }
+
+        return $this->createResponse($this->put('/health/profile', $payload));
     }
 }

@@ -105,7 +105,7 @@ class FriendService extends TokenRefreshingService
      */
     public function addFriend($message, $potentialFriendId = null, $potentialFriendEmail = null)
     {
-        $payload = ['message' => $message];
+        $payload = array('message' => $message);
         if (!is_null($potentialFriendId) && intval($potentialFriendId) > 0) {
             $payload['id'] = $potentialFriendId;
         }

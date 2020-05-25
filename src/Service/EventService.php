@@ -42,7 +42,7 @@ class EventService extends TokenRefreshingService
      */
     public function create(Event $event)
     {
-        $payload = [
+        $payload = array(
             'group' => $event->groupId(),
             'title' => $event->name(),
             'description' => $event->description(),
@@ -51,7 +51,7 @@ class EventService extends TokenRefreshingService
             'end' => $event->endTimestamp(),
             'coordinates' => $event->coordinates(),
             'private' => '0',
-        ];
+        );
 
         return $this->createResponse($this->postFormData("/events/new", $payload));
     }
