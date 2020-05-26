@@ -84,6 +84,18 @@ class UserService extends TokenRefreshingService
     }
 
     /**
+     * Use this to update the profile status message.
+     *
+     * @param string $message
+     *
+     * @return array
+     */
+    public function updateStatusMessage($message)
+    {
+        return $this->createResponse($this->put(self::BASE . '/status-message', array('message' => $message)));
+    }
+
+    /**
      * This returns all the friends of the current authenticated user.
      *
      * @param int $offset [optional] offset for pagination
