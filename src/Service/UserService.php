@@ -74,6 +74,20 @@ class UserService extends TokenRefreshingService
     }
 
     /**
+     * Use this to upload a secondary image to the authenticated user.
+     *
+     * @param string $absoluteFilePath Absolute file path to an image file. ex: /tmp/test-image.jpg
+     *
+     * @return array
+     */
+    public function uploadSecondaryLogo($absoluteFilePath)
+    {
+        return $this->createResponse(
+            $this->uploadFile(self::BASE . "/upload-secondary-logo", new File('logo', $absoluteFilePath))
+        );
+    }
+
+    /**
      * Use this to get the current authenticated user.
      *
      * @return array
@@ -180,6 +194,20 @@ class UserService extends TokenRefreshingService
     public function getHealthProfile()
     {
         return $this->createResponse($this->get('/health/profile'));
+    }
+
+    /**
+     * Use this to invite a new practitioner into the platform by their email address.
+     *
+     * @param string $emailAddress The emil address of the person that you are inviting
+     *
+     * @return array
+     */
+    public function inviteHealthPractitioner($emailAddress)
+    {
+        return $this->createResponse(
+            $this->postFormData('/health/invite-practitioner', array('email' => $emailAddress))
+        );
     }
 
     /**
