@@ -176,13 +176,37 @@ class UserService extends TokenRefreshingService
     }
 
     /**
-     * Returns any health condition verifications done by a practitioner.
+     * Returns any approved health condition verifications given by a practitioner.
+     *
+     * @param bool $onlyApproved [optional] pass false to get all the verifications including unapproved ones
      *
      * @return array
      */
-    public function getHealthConditionVerifications()
+    public function getHealthConditionVerifications($onlyApproved = true)
     {
-        return $this->createResponse($this->get('/health/condition-verifications'));
+        $onlyApproved = ($onlyApproved) ? 1 : 0;
+        return $this->createResponse(
+            $this->get('/health/condition-verifications', array('is_approved' => $onlyApproved))
+        );
+    }
+
+    /**
+     * Use this to attach a verification document to an existing verification request.
+     *
+     * @param int    $verificationRequestId A valid verification request id
+     * @param string $absoluteFilePath      Absolute file path to a file. ex: /tmp/verification.docx
+     *
+     * @return array
+     * @see  getHealthConditionVerifications To get a verification id
+     */
+    public function attachVerificationDocument($verificationRequestId, $absoluteFilePath)
+    {
+        return $this->createResponse(
+            $this->uploadFile(
+                "/health/condition-verifications/{$verificationRequestId}/attachment",
+                new File('attachment', $absoluteFilePath)
+            )
+        );
     }
 
     /**
