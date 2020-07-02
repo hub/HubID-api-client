@@ -85,13 +85,13 @@ class TokenRefreshingService extends Service
     /**
      * @inheritdoc
      */
-    protected function uploadFile($api, File $file)
+    protected function uploadFile($api, File $file, array $params = array())
     {
         try {
-            return parent::uploadFile($api, $file);
+            return parent::uploadFile($api, $file, $params);
         } catch (HubIdApiException $ex) {
             if ($this->handleHubIdApiException($ex)) {
-                return parent::uploadFile($api, $file);
+                return parent::uploadFile($api, $file, $params);
             }
             throw $ex;
         }

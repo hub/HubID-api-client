@@ -1,6 +1,9 @@
-#IDEs
+# IDEs
 .idea/
 
 # Composer
 composer.lock
 vendor/
+
+# Other
+.DS_Store

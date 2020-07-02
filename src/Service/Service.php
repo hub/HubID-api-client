@@ -157,18 +157,26 @@ class Service
     }
 
     /**
-     * Use this to upload a file.
+     * Use this to upload a file with optional POST parameters.
      *
-     * @param string $api  The API relative url
-     * @param File   $file the file to upload
+     * @param string $api    The API relative url
+     * @param File   $file   The file to upload
+     * @param array  $params Request parameters / payload
      *
      * @return array
      */
-    protected function uploadFile($api, File $file)
+    protected function uploadFile($api, File $file, array $params = array())
     {
+        $multipart = array($file->toArray());
+        if (!empty($params)) {
+            foreach ($params as $key => $value) {
+                $multipart[] = array('name' => $key, 'contents' => $value);
+            }
+        }
+
         return $this->rawRequest(
             $api,
-            array('multipart' => array($file->toArray())),
+            array('multipart' => $multipart),
             'post'
         );
     }
