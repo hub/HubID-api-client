@@ -44,6 +44,19 @@ class UserService extends TokenRefreshingService
     }
 
     /**
+     * This sends an email with a link to reset a user's password. The email must belong to a valid Hub Culture account.
+     * The email won't be sent if the account is still pending or deleted.
+     *
+     * @param string $email The email address to be used to match an account and to send the email.
+     *
+     * @return array
+     */
+    public function sendForgotPasswordEmail($email)
+    {
+        return $this->createResponse($this->postFormData("/auth/forgot?email={$email}"));
+    }
+
+    /**
      * Use this to retrieve a user by their id.
      *
      * @param int $id User identifier.

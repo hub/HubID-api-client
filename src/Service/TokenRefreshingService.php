@@ -155,7 +155,7 @@ class TokenRefreshingService extends Service
             return false;
         }
 
-        $this->debug(sprintf(
+        $this->log(sprintf(
             "access_token has expired. Sending a refresh token request for API call : '%s'",
             $exception->getCalledApi()
         ));
@@ -186,7 +186,7 @@ class TokenRefreshingService extends Service
         if (intval($jwtPayload['exp']) <= time()) {
             try {
                 $refreshToken = $this->getRedirectingLoginHelper()->getRefreshToken($accessToken);
-                $this->debug("refreshing the access token as it was expired at " . $jwtPayload['exp']);
+                $this->log("refreshing the access token as it was expired at " . $jwtPayload['exp']);
             } catch (InvalidArgumentException $ex) {
                 return $accessToken;
             } catch (HubIdApiException $ex) {
@@ -207,20 +207,5 @@ class TokenRefreshingService extends Service
     private function getRedirectingLoginHelper()
     {
         return new RedirectingLoginHelper($this->config);
-    }
-
-    /**
-     * This logs the error using any configured logger if debug mode is enabled via config.
-     *
-     * @param string $message Message to log as a DEBUG output
-     */
-    private function debug($message)
-    {
-        if (!$this->config['debug']) {
-            return;
-        }
-        if (!is_null($this->logger)) {
-            $this->logger->debug(HubClient::COOKIE_TOKEN_NAME . ' : ' . $message);
-        }
     }
 }

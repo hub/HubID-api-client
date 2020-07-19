@@ -258,6 +258,29 @@ class Service
     }
 
     /**
+     * This logs any given string message to the sdk client default log file and to any application provided logger.
+     *
+     * @param string $string The message to log
+     */
+    protected function log($string)
+    {
+        if (!$this->config['debug']) {
+            return;
+        }
+
+        // log to the sdk client default log file
+        if (!empty($this->config['log_file'])) {
+            $now = date('Y-m-d H:i:s');
+            file_put_contents($this->config['log_file'], "[{$now}] [DEBUG] {$string}" . PHP_EOL, FILE_APPEND);
+        }
+
+        // also log to the application provided logger
+        if (!is_null($this->logger)) {
+            $this->logger->debug(HubClient::COOKIE_TOKEN_NAME . ' : ' . $string);
+        }
+    }
+
+    /**
      * Use this to send a raw request of any type. Any types meant a form submission or a json or anything else
      * supported by the GuzzleHttp library.
      *
@@ -380,9 +403,6 @@ class Service
         }
 
         $string = sprintf($string, strtoupper($method), $this->config['base_path'] . $api, $headerString, $dataString);
-        file_put_contents($this->config['log_file'], $string . PHP_EOL, FILE_APPEND);
-        if (!is_null($this->logger)) {
-            $this->logger->debug(HubClient::COOKIE_TOKEN_NAME . ' : ' . $string);
-        }
+        $this->log($string);
     }
 }
