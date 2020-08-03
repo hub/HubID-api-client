@@ -135,7 +135,7 @@ class PavilionService extends TokenRefreshingService
     }
 
     /**
-     * This hard deletes a given pavilion by its id. You can only deletes the pavilions that you have created.
+     * This hard deletes a given pavilion by its id. You can only delete the pavilions that you have created.
      *
      * Please note that if this is called within the first five minutes of the pavilion creation, this will also delete
      * all the related entity data such as groups, group wikis and group project that it created originally.

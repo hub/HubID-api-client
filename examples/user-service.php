@@ -31,6 +31,8 @@ HTML;
     var_dump($user);
     $user = $service->getSelf();
     var_dump($user);
+//    $response = $service->registerNewSubUser('test sub account via API sdk', SubProfileType::bot(), 'object__property');
+//    var_dump($response);
 
     // example friend list retrieval for your authenticated user
     $service = new FriendService($config);

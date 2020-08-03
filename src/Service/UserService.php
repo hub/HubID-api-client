@@ -7,6 +7,7 @@
 namespace Hub\HubAPI\Service;
 
 use Hub\HubAPI\Service\Model\File;
+use Hub\HubAPI\Service\Model\SubProfileType;
 
 class UserService extends TokenRefreshingService
 {
@@ -41,6 +42,32 @@ class UserService extends TokenRefreshingService
         }
 
         return $this->createResponse($this->postFormData(self::BASE, $payload));
+    }
+
+    /**
+     * Use this to launch a new sub account under the authenticated user account.
+     * Sub accounts are secondary identities for a given user and are transferable.
+     *
+     * For example: A property/pavilion can be owned by a business owned by the main account holder where the main
+     * account is a personal account. As per this example, it may be convenient to launch a new sub 'entity' type
+     * profile.
+     *
+     * @param string         $accountName    Name of the sub user account. Ex: "User B's boat by the sea"
+     * @param SubProfileType $profileType    Type of the profile. Valid types are 'entity' & 'bot'.
+     * @param string         $profileVariant Variant of the sub profile type. A variant describes more about a given sub
+     *                                       profile type. Ex: "entity__nonprofit"
+     *
+     * @return array
+     */
+    public function registerNewSubUser($accountName, SubProfileType $profileType, $profileVariant)
+    {
+        $payload = array(
+            'name' => $accountName,
+            'profile_type' => (string)$profileType,
+            'profile_variant' => $profileVariant,
+        );
+
+        return $this->createResponse($this->postFormData(self::BASE . '/sub-profiles', $payload));
     }
 
     /**
