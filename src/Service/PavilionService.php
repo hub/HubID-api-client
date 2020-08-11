@@ -20,6 +20,7 @@ use InvalidArgumentException;
 class PavilionService extends TokenRefreshingService
 {
     const BASE = '/pavilions';
+    const DEFAULT_PAGINATION_LIMIT = 10;
 
     /**
      * Use this to create a new pavilion. As part of the process, it also creates a dedicated hub (aka group) with
@@ -110,12 +111,22 @@ class PavilionService extends TokenRefreshingService
      *
      * @param string|null $territory [optional] This is the territory where a pavilion belongs. Use this for filtering.
      *                               to. Ex: Emerald City, California State
+     * @param int         $offset    [optional] offset for pagination
+     * @param int         $limit     [optional] limit for pagination
      *
      * @return array
      */
-    public function getPavilions($territory = null)
+    public function getPavilions($territory = null, $offset = 0, $limit = self::DEFAULT_PAGINATION_LIMIT)
     {
-        return $this->get(self::BASE . '/list?territory=' . $territory);
+        $offset = intval($offset) === 0 ? 0 : intval($offset);
+        $limit = intval($limit) === 0 ? self::DEFAULT_PAGINATION_LIMIT : intval($limit);
+
+        $api = self::BASE . "/list?offset={$offset}&limit={$limit}";
+        if (!empty($territory)) {
+            $api .= "?territory={$territory}";
+        }
+
+        return $this->createResponse($this->get($api));
     }
 
     /**
