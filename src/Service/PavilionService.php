@@ -121,7 +121,7 @@ class PavilionService extends TokenRefreshingService
         $offset = intval($offset) === 0 ? 0 : intval($offset);
         $limit = intval($limit) === 0 ? self::DEFAULT_PAGINATION_LIMIT : intval($limit);
 
-        $api = self::BASE . "/list?offset={$offset}&limit={$limit}";
+        $api = "/v2/pavilions/list?offset={$offset}&limit={$limit}";
         if (!empty($territory)) {
             $api .= "?territory={$territory}";
         }
