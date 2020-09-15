@@ -125,6 +125,16 @@ class MessageService extends TokenRefreshingService
     }
 
     /**
+     * Use this to mark a message thread as 'read'.
+     *
+     * @param int $messageThreadId Existing message thread id.
+     */
+    public function markAsRead($messageThreadId)
+    {
+        $this->createResponse($this->put("/messages/tag/thread/{$messageThreadId}/updateUnread"));
+    }
+
+    /**
      * This extracts the messages threads from a given raw api response array.
      *
      * @param array $apiResponse The raw API response.
