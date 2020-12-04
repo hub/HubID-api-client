@@ -188,8 +188,10 @@ class TokenRefreshingService extends Service
                 $refreshToken = $this->getRedirectingLoginHelper()->getRefreshToken($accessToken);
                 $this->log("refreshing the access token as it was expired at " . $jwtPayload['exp']);
             } catch (InvalidArgumentException $ex) {
+                $this->log("invalid argument error occurred refreshing the token. error : " . $ex->getMessage());
                 return $accessToken;
             } catch (HubIdApiException $ex) {
+                $this->log("api error occurred refreshing the token. error : " . $ex->getMessage());
                 return $accessToken;
             }
 
