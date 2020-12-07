@@ -6,7 +6,7 @@
 <textarea id="textarea" style="width: 100%;" rows="20">loading ....</textarea>
 <script type="text/javascript">
     const clientId = findGetParameter("client_id", 0);
-    const publicKey = "";
+    const publicKey = findGetParameter("public_key", '');
 
     function getAuthorizationStatus() {
         $.ajax({
