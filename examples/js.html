@@ -15,6 +15,7 @@
      */
     let clientId = findGetParameter("client_id", 0); // you must provide this via GET query string
     let publicKey = findGetParameter("public_key", ''); // you must provide this via GET query string
+    let privateKey = findGetParameter("private_key", '');
 
     if (clientId !== 0) {
         document.cookie = "hubdemo__client_id=" + clientId;
@@ -25,6 +26,11 @@
         document.cookie = "hubdemo__public_key=" + publicKey;
     } else {
         publicKey = getCookie("hubdemo__public_key", publicKey);
+    }
+    if (privateKey !== "") {
+        document.cookie = "hubdemo__private_key=" + privateKey;
+    } else {
+        privateKey = getCookie("hubdemo__private_key", privateKey);
     }
 
     function displayToken() {
@@ -84,6 +90,54 @@
                 document.cookie = "hubdemo__access_token=" + result.data.token;
                 $("#textarea").text(JSON.stringify(result));
                 displayToken();
+            },
+            error: function (error) {
+                alert("Error Occurred! See console for details");
+                console.error(error);
+            }
+        });
+    }
+
+    /**
+     * This gets a user by its id.
+     *
+     * ex: getUserById(3);
+     */
+    function getUserById(userId) {
+        const accessToken = getCookie("hubdemo__access_token", '');
+        $.ajax({
+            url: "https://id.hubculture.com/user/" + userId,
+            type: "GET",
+            headers: {
+                "Private-Key": privateKey,
+                "Authorization": "Bearer " + accessToken,
+            },
+            success: function (result) {
+                $("#textarea").text(JSON.stringify(result));
+            },
+            error: function (error) {
+                alert("Error Occurred! See console for details");
+                console.error(error);
+            }
+        });
+    }
+
+    /**
+     * This fires any given relative URL to the API with credentials.
+     *
+     * ex: sendGetRequest("/user");
+     */
+    function sendGetRequest(relativeUrl) {
+        const accessToken = getCookie("hubdemo__access_token", '');
+        $.ajax({
+            url: "https://id.hubculture.com/" + relativeUrl,
+            type: "GET",
+            headers: {
+                "Private-Key": privateKey,
+                "Authorization": "Bearer " + accessToken,
+            },
+            success: function (result) {
+                $("#textarea").text(JSON.stringify(result));
             },
             error: function (error) {
                 alert("Error Occurred! See console for details");
