@@ -3,12 +3,40 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body onload="getAuthorizationStatus();">
+<button onclick="getAccessToken()">Get Access Token</button>
+<div id="access-token"></div>
+<br/><br/>
 <textarea id="textarea" style="width: 100%;" rows="20">loading ....</textarea>
 <script type="text/javascript">
-    const clientId = findGetParameter("client_id", 0);
-    const publicKey = findGetParameter("public_key", '');
+    /**
+     * Please visit this script in a browser as follows.
+     *
+     * http://localhost:8085/js.html?client_id=xxxxx&public_key=public_xxxxxxxxxx
+     */
+    let clientId = findGetParameter("client_id", 0); // you must provide this via GET query string
+    let publicKey = findGetParameter("public_key", ''); // you must provide this via GET query string
+
+    if (clientId !== 0) {
+        document.cookie = "hubdemo__client_id=" + clientId;
+    } else {
+        clientId = getCookie("hubdemo__client_id", clientId);
+    }
+    if (publicKey !== "") {
+        document.cookie = "hubdemo__public_key=" + publicKey;
+    } else {
+        publicKey = getCookie("hubdemo__public_key", publicKey);
+    }
+
+    function displayToken() {
+        const accessToken = getCookie("hubdemo__access_token", '');
+        if (accessToken !== "") {
+            $("#access-token").html("<br/>Current Token : <code>" + accessToken + "</code>");
+        }
+    }
 
     function getAuthorizationStatus() {
+        displayToken();
+
         $.ajax({
             url: "https://id.hubculture.com/oauth/authorization/status",
             data: {
@@ -28,6 +56,49 @@
         });
     }
 
+    /**
+     * This will use the end user login credentials to gain an access_token with your client application id.
+     */
+    function getAccessToken() {
+        const hubIDUserName = prompt("Please enter your Hub Culture username", "");
+        if (hubIDUserName == null) {
+            return;
+        }
+        const hubIDPassword = prompt("Please enter your Hub Culture password", "");
+        if (hubIDPassword == null) {
+            return;
+        }
+
+        $.ajax({
+            url: "https://id.hubculture.com/auth",
+            data: {
+                "client_id": clientId,
+                "email": hubIDUserName,
+                "password": hubIDPassword
+            },
+            type: "POST",
+            headers: {
+                "Public-Key": publicKey,
+            },
+            success: function (result) {
+                document.cookie = "hubdemo__access_token=" + result.data.token;
+                $("#textarea").text(JSON.stringify(result));
+                displayToken();
+            },
+            error: function (error) {
+                alert("Error Occurred! See console for details");
+                console.error(error);
+            }
+        });
+    }
+
+    /**
+     * Helper Function : This retrieves query string parameter values.
+     *
+     * @param {String} parameterName Name of the get parameter
+     * @param {String} defaultValue  Default value to be used if not found
+     * @return {*}
+     */
     function findGetParameter(parameterName, defaultValue) {
         let result = defaultValue;
         let tmp = [];
@@ -42,6 +113,23 @@
             });
 
         return result;
+    }
+
+    /**
+     * Helper Function : This retrieves a cookie value by a given cookie name.
+     *
+     * @param {String} cookieName   Name of the cookie
+     * @param {String} defaultValue Default value to be used if not found
+     * @return {*}
+     */
+    function getCookie(cookieName, defaultValue) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${cookieName}=`);
+        if (parts.length === 2) {
+            return parts.pop().split(';').shift();
+        }
+
+        return defaultValue;
     }
 </script>
 </body>
