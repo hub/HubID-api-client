@@ -114,10 +114,15 @@ class Service
      */
     protected function get($api, array $params = array())
     {
-        return $this->requestWithForm(
-            sprintf('%s?%s', $api, http_build_query($params)),
-            'get'
-        );
+        if (!empty($params)) {
+            if (strpos($api, '?') === false) {
+                $api = sprintf('%s?%s', $api, http_build_query($params));
+            } else {
+                $api = sprintf('%s&%s', $api, http_build_query($params));
+            }
+        }
+
+        return $this->requestWithForm($api, 'get');
     }
 
     /**
