@@ -114,7 +114,10 @@ class Service
      */
     protected function get($api, array $params = array())
     {
-        return $this->requestWithForm($api, 'get', $params);
+        return $this->requestWithForm(
+            sprintf('%s?%s', $api, http_build_query($params)),
+            'get'
+        );
     }
 
     /**
