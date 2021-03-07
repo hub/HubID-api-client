@@ -52,13 +52,29 @@ class UltraExchangeService extends TokenRefreshingService
     }
 
     /**
-     * Use this to retrieve all the available ultra asset details.
+     * This returns a list oif all available categories.
      *
      * @return array
      */
-    public function getAssets()
+    public function getAvailableAssetCategories()
     {
-        return $this->createResponse($this->get(self::BASE . "/assets"));
+        return $this->createResponse($this->get(self::BASE . "/asset-categories"));
+    }
+
+    /**
+     * Use this to retrieve all the available ultra asset details.
+     *
+     * @param null|string $category A valid category slug to be used to filter assets
+     * @return array
+     */
+    public function getAssets($category = null)
+    {
+        $filters = array();
+        if (!empty($category)) {
+            $filters['category'] = $category;
+        }
+
+        return $this->createResponse($this->get(self::BASE . "/assets", $filters));
     }
 
     /**
