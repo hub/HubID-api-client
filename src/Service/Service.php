@@ -165,35 +165,6 @@ class Service
     }
 
     /**
-     * Use this to upload multiple files with optional POST parameters.
-     *
-     * @param string $api    The API relative url
-     * @param File[] $files  An array list of files to be uploaded
-     * @param array  $params [optional] Request parameters / payload
-     *
-     * @return array
-     * @throws HubIdApiException on any API error
-     */
-    protected function postFormDataWithFiles($api, array $files, array $params = array())
-    {
-        $multipart = array();
-        if (!empty($files)) {
-            foreach ($files as $file) {
-                if ($file instanceof File) {
-                    $multipart[] = $file->toArray();
-                }
-            }
-        }
-        if (!empty($params)) {
-            foreach ($params as $key => $value) {
-                $multipart[] = array('name' => $key, 'contents' => $value);
-            }
-        }
-
-        return $this->rawRequest($api, array('multipart' => $multipart), 'post');
-    }
-
-    /**
      * Use this to upload a file with optional POST parameters.
      *
      * @param string $api    The API relative url
