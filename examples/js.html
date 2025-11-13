@@ -1,23 +1,18 @@
 <html>
 <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="assets/jquery.jsonview.min.css">
-    <script src="assets/jquery.jsonview.min.js"></script>
 </head>
 <body onload="getAuthorizationStatus();">
 <button onclick="getAccessToken()">Get Access Token</button>
 <div id="access-token"></div>
-<p><b>You may open developer console and call the test get method:</b></p>
-<code>sendGetRequest("/test-get-api");</code>
 <br/><br/>
-<div id="json-view">loading ....</div>
+<textarea id="textarea" style="width: 100%;" rows="20">loading ....</textarea>
 <script type="text/javascript">
     /**
      * Please visit this script in a browser as follows.
      *
      * http://localhost:8085/js.html?client_id=xxxxx&public_key=public_xxxxxxxxxx
      */
-    let apiBaseUrl = findGetParameter("api_base_url", 'https://id.hubculture.com'); // [optional] base url if using a local API instance
     let clientId = findGetParameter("client_id", 0); // you must provide this via GET query string
     let publicKey = findGetParameter("public_key", ''); // you must provide this via GET query string
     let privateKey = findGetParameter("private_key", '');
@@ -41,7 +36,7 @@
     function displayToken() {
         const accessToken = getCookie("hubdemo__access_token", '');
         if (accessToken !== "") {
-            $("#access-token").html("<br/><b>Current Token</b> : <code>" + accessToken + "</code>");
+            $("#access-token").html("<br/>Current Token : <code>" + accessToken + "</code>");
         }
     }
 
@@ -49,7 +44,7 @@
         displayToken();
 
         $.ajax({
-            url: apiBaseUrl + "/oauth/authorization/status",
+            url: "https://id.hubculture.com/oauth/authorization/status",
             data: {
                 "client_id": clientId
             },
@@ -58,7 +53,7 @@
                 "Public-Key": publicKey,
             },
             success: function (result) {
-                $("#json-view").JSONView(result);
+                $("#textarea").text(JSON.stringify(result));
             },
             error: function (error) {
                 alert("Error Occurred! See console for details");
@@ -80,9 +75,8 @@
             return;
         }
 
-        $("#json-view").text("loading ...");
         $.ajax({
-            url: apiBaseUrl + "/auth",
+            url: "https://id.hubculture.com/auth",
             data: {
                 "client_id": clientId,
                 "email": hubIDUserName,
@@ -94,7 +88,7 @@
             },
             success: function (result) {
                 document.cookie = "hubdemo__access_token=" + result.data.token;
-                $("#json-view").JSONView(result);
+                $("#textarea").text(JSON.stringify(result));
                 displayToken();
             },
             error: function (error) {
@@ -110,7 +104,22 @@
      * ex: getUserById(3);
      */
     function getUserById(userId) {
-        sendGetRequest("/user/" + userId);
+        const accessToken = getCookie("hubdemo__access_token", '');
+        $.ajax({
+            url: "https://id.hubculture.com/user/" + userId,
+            type: "GET",
+            headers: {
+                "Private-Key": privateKey,
+                "Authorization": "Bearer " + accessToken,
+            },
+            success: function (result) {
+                $("#textarea").text(JSON.stringify(result));
+            },
+            error: function (error) {
+                alert("Error Occurred! See console for details");
+                console.error(error);
+            }
+        });
     }
 
     /**
@@ -119,20 +128,19 @@
      * ex: sendGetRequest("/user");
      */
     function sendGetRequest(relativeUrl) {
-        $("#json-view").text("loading ...");
         const accessToken = getCookie("hubdemo__access_token", '');
         $.ajax({
-            url: apiBaseUrl + relativeUrl,
+            url: "https://id.hubculture.com/" + relativeUrl,
             type: "GET",
             headers: {
                 "Private-Key": privateKey,
                 "Authorization": "Bearer " + accessToken,
             },
             success: function (result) {
-                $("#json-view").JSONView(result);
+                $("#textarea").text(JSON.stringify(result));
             },
             error: function (error) {
-                alert("Error Occurred! See developer console / network tab for details");
+                alert("Error Occurred! See console for details");
                 console.error(error);
             }
         });

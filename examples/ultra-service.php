@@ -26,13 +26,6 @@ HTML;
 
     // retrieving all ultra assets
     $service = new UltraExchangeService($config);
-
-    $result = $service->getAvailableAssetCategories();
-    var_dump($result);
-
-    $result = $service->getAssets('fiat');
-    var_dump($result);
-
     $result = $service->getRates();
     var_dump($result);
 
