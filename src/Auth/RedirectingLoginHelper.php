@@ -52,7 +52,8 @@ class RedirectingLoginHelper extends Service
     public function getRefreshToken($accessToken)
     {
         $this->setAccessToken($accessToken);
-        $response = $this->put('/token');
+            $response = $this->put('/token');
+           
         if (!empty($response['error']) && $response['error'] === 'token_invalid') {
             throw new HubIdApiException('Invalid access token provided');
         }
